@@ -15,7 +15,7 @@ const app = express();
 // define the port based on an environment variable
 // this will assist in deployment to Google Cloud
 // it defaults to 8080 for local development
-const port = (process.env.PORT !== undefined) ? process.env.PORT : 8080;
+const port = process.env.PORT || 8080;
 
 // the MongoDB connection also uses an environment variable for security
 // defaults or hard codes should never happen since the connection string includes the password
