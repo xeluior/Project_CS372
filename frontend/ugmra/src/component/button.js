@@ -1,9 +1,6 @@
-const Button = (buttonText, clickEvent) => {
+const Button = ({ buttonText, clickEvent }) => {
   return (
-    <>
-      <input type="button" value={buttonText} onClick={clickEvent}></input>
-    </>
+    <button type="button" value="Search" className="search_button" onClick={clickEvent}>{buttonText}</button>
   );
 };
-
 export default Button;

@@ -1,0 +1,64 @@
+.top-center {
+    display: flex;
+    flex-direction: column;  /* This sets the layout in a column */
+    align-items: center;  /* Align items horizontally at the center */
+    justify-content: center;  /* Align items vertically at the center */
+  }
+/* Previous background styles */
+body {
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(to bottom right, #FF9A8C, #FFB6B9, #FDD692, #FCF6B1);
+    height: 100vh;
+    color: #333;
+  }
+  
+  /* Modern search bar styles */
+  .search input[type="text"] {
+    width: 70%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    box-sizing: border-box;
+    border: 2px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+    background-color: white;
+    transition: border 0.2s ease-in-out;
+  }
+  
+  .search input[type="text"]:focus {
+    border: 2px solid #555;
+  }
+  
+  /* Modern button styles */
+  .search button {
+    padding: 14px 20px;
+    margin: 8px 0;
+    border: none;
+    border-radius: 4px;
+    background-color: #555;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+  }
+  
+  .search button:hover {
+    background-color: #333;
+  }
+
+  /*Links*/
+  nav ul {
+  position: fixed; /* or 'absolute' if you prefer */
+  bottom: 0;
+  left: 0;
+  margin: 0;
+  padding: 10px;
+  list-style: none;
+}
+
+nav ul li {
+  display: inline;
+  margin-right: 10px;
+}
+  
