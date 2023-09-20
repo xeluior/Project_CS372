@@ -7,7 +7,6 @@ const bcrypt = require('bcrypt');
 require('dotenv').config();
 
 // application constants
-const route = "/auth";
 const salt_rounds = 10;
 const router = express.Router();
 const users = mongodb.MongoClient(process.env.MONGO_URI).db(/* TODO */).collection(/* TODO */);
@@ -30,13 +29,13 @@ function auth(req, _, next) {
     });
 }
 
-// POST request returns a session id after a successful auth
-router.post(route, auth, (_, res) => {
+// login endpoint returns a session id after a successful auth
+router.post("/auth/login", auth, (_, res) => {
     res.send(/* TODO: session id */);
 });
 
-// PUT request creates a new user with username and hashed password
-router.put(route, (req, res) => {
+// create endpoint creates a new user with username and hashed password
+router.post("/auth/create", (req, res) => {
     // hash the password
     bcrypt.hash(req.body.password, salt_rounds).then((hashed_pwd) => {
         // insert to mongo
@@ -50,11 +49,12 @@ router.put(route, (req, res) => {
     });
 });
 
-// DELETE request deletes the user after reauthenticating them
-router.delete(route, auth, (req, res) => {
+// delete endpoint deletes the user after reauthenticating them
+router.post("/auth/delete", auth, (req, res) => {
     users.deleteOne({ username: req.body.username }).then(() => {
         // send NO CONTENT success after delete
         res.sendStatus(204);
     });
+    /* TODO: delete content associated with the user */
 });
 

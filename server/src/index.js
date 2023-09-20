@@ -1,6 +1,8 @@
 // module imports
 const express = require("express");
 const mongodb = require("mongodb");
+const auth = require('./auth.router.js');
+const cors = require('cors');
 
 // environment configuration from .env file
 require("dotenv").config();
@@ -22,6 +24,10 @@ const port = process.env.PORT || 8080;
 // this will fail if the environment variable is not present
 const mongo = new mongodb.MongoClient(process.env.MONGO_URI);
 const media = mongo.db(db_name).collection(collection_name);
+
+// use additional routes
+app.use(cors());
+app.use(auth.router);
 
 // recommendation route
 // takes the "ns" and "id" query parameters to uniquely identify the media to get
