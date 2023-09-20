@@ -37,6 +37,7 @@ app.get("/recommendation", (req, res) => {
         id: req.query.id
     })
     .then((result) => {
+        /* TODO: actually recommend things */
         res.send(result);
     });
 });
@@ -45,6 +46,7 @@ app.get("/recommendation", (req, res) => {
 // a "text" index needs to be made on the title field before this will work
 app.get("/search", (req, res) => {
     media.find({
+        /* TODO: filters */
         $text: {
             $search: req.query.title
         }
