@@ -7,7 +7,11 @@ const TextInput = (props) => {
       type="text"
       placeholder={props.placeHolderText}
       value={searchString}
-      onChange={(e) => setSearchString(e.target.value)}
+      parentCallback={props.parentCallback}
+      onChange={(e) => {
+        setSearchString(e.target.value);
+        props.parentCallback(e.target.value);
+      }}
     />
   );
 };
