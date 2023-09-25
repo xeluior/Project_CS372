@@ -1,18 +1,12 @@
-const Button = ({ 
-  buttonText, 
-  clickEvent, 
-  type = "button", 
-  value = "", 
-  className = "search_button" 
-}) => {
+const Button = (props) => {
   return (
     <button 
-      type={type} 
-      value={value} 
-      className={className} 
-      onClick={clickEvent}
+      type={props.type} 
+      value={props.value} 
+      className={props.className} 
+      onClick={props.clickEvent}
     >
-      {buttonText}
+      {props.buttonText}
     </button>
   );
 }

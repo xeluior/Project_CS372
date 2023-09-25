@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 
-const TextInput = (placeHolderText) => {
+const TextInput = (props) => {
   const [searchString, setSearchString] = useState();
   return (
     <input
       type="text"
-      placeholder={placeHolderText}
+      placeholder={props.placeHolderText}
       value={searchString}
       onChange={(e) => setSearchString(e.target.value)}
     />
