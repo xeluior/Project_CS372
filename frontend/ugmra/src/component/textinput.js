@@ -1,17 +1,31 @@
-import React, { useState } from "react";
+import React from "react";
 
-const TextInput = (textInputClassName, placeHolderText) => {
-  const [searchString, setSearchString] = useState();
-  return (
-    <div className={textInputClassName}>
+class TextInput extends React.Component {
+  state = {
+    text: "",
+  };
+
+  updateState = (e) => {
+    this.setState({text: e});
+  };
+
+  onClick = (updatedText) => {
+    this.setState({ text: updatedText.target.value })
+    this.props.parentCallback(updatedText.target.value)
+  }
+
+  render() {
+    const { text } = this.state;
+    return (
       <input
         type="text"
-        placeholder={placeHolderText}
-        value={searchString}
-        onChange={(e) => setSearchString(e.target.value)}
+        placeholder={this.props.placeHolderText}
+        value={text}
+        parentCallback={this.props.parentCallback}
+        onChange={this.onClick}
       />
-    </div>
-  );
+    );
+  }
 }
 
 export default TextInput;
