@@ -57,13 +57,13 @@ export const RegisterLink = styled(Link)`
     display: block;
     margin-top: 10px;
     text-align: center;
-    color: #000;  // Black Link
+    color: #48BB78;  // Green link
     text-decoration: none;
     padding: 10px;
     transition: color 0.3s;
 
     &:hover {
-        color: ##0000EE;  // Darker green on hover
+        color: #38A169;  // Darker green on hover
         text-decoration: underline;
     }
 `;
