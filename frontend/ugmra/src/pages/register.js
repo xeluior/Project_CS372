@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import { Container, LoginForm, Input, Button, RegisterLink, Title } from "../component/StyledComponents";
 
-export default function Login() {
+
+
+export default function Register() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
@@ -24,10 +26,15 @@ export default function Login() {
     return (
         <Container>
             <LoginForm onSubmit={handleSubmit}>
-                <Title>Login</Title>
+                <Title>Register</Title>
                 <Input
                     type="text"
                     placeholder="Email"
+                    value={email}
+                />
+                <Input
+                    type="text"
+                    placeholder="Confirm email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                 />
@@ -35,10 +42,14 @@ export default function Login() {
                     type="password"
                     placeholder="Password"
                     value={password}
+                />
+                <Input
+                    type="password"
+                    placeholder="Confirm Password"
+                    value={password}
                     onChange={(e) => setPassword(e.target.value)}
                 />
-                <Button type="submit">Login</Button>
-                    <RegisterLink to="/register">Don't have an account? Register here!</RegisterLink>
+                <Button type="submit">Register</Button>
             </LoginForm>
         </Container>
     );

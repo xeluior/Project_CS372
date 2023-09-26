@@ -6,7 +6,7 @@ import "../App.css";
 
 const Recommend = () => {
     return (
-        <h1>Screen 3</h1>
+        <h1 style={{ color: 'white' }}>Screen 3</h1>
     );
   }
   

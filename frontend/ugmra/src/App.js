@@ -4,7 +4,12 @@ import Home from "./pages/home";
 import Filter from "./pages/filter";
 import Recommend from "./pages/recommend";
 import Login from "./pages/login";
+import Register from "./pages/register";
 import "./App.css";
+
+const linkStyle = {
+  color: 'white'
+};
 
 const App = () => {
   return (
@@ -12,16 +17,19 @@ const App = () => {
       <nav>
         <ul>
           <li>
-            <Link to="/">Home</Link>
+            <Link to="/" style={linkStyle}>Home</Link>
           </li>
           <li>
-            <Link to="/filter">Filter</Link>
+            <Link to="/filter" style={linkStyle}>Filter</Link>
           </li>
           <li>
-            <Link to="/recommend">Recommend</Link>
+            <Link to="/recommend" style={linkStyle}>Recommend</Link>
           </li>
           <li>
-            <Link to="/login">Login</Link>
+            <Link to="/login" style={linkStyle}>Login</Link>
+          </li>
+          <li>
+            <Link to="/register" style={linkStyle}>Register</Link>
           </li>
         </ul>
       </nav>
@@ -31,6 +39,7 @@ const App = () => {
         <Route exact path="/filter" element={<Filter />}></Route>
         <Route exact path="/recommend" element={<Recommend />}></Route>
         <Route exact path="/login" element={<Login />}></Route>
+        <Route exact path="/register" element={<Register/>}></Route>
       </Routes>
     </Router>
   );
