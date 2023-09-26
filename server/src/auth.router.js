@@ -76,6 +76,8 @@ router.post("/create", (req, res) => {
 // delete endpoint deletes the user after reauthenticating them
 router.post("/delete", auth, (req, res) => {
     users.deleteOne({ username: req.body.username }).then(() => {
+        return sessions.deleteMany({ username: req.body.username })
+    }).then(() => {
         // send NO CONTENT success after delete
         res.sendStatus(204);
     });
