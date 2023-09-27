@@ -1,15 +1,10 @@
 import React, { useState } from "react";
 import { Container, LoginForm, Input, Button, RegisterLink, Title } from "../component/StyledComponents";
+import { isValidEmail } from "../functions";
 
 export default function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-
-    const isValidEmail = (email) => {
-        const regex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
-        return regex.test(email);
-    };
-    
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -20,6 +15,9 @@ export default function Login() {
             alert("Please enter a password!")
         }
     };
+
+
+    //Backend code to get session ID and check if username and password match
 
     return (
         <Container>
