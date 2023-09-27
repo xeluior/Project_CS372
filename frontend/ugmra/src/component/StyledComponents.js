@@ -57,7 +57,7 @@ export const RegisterLink = styled(Link)`
     display: block;
     margin-top: 10px;
     text-align: center;
-    color: #48BB78;  // Green link
+    color: #000;  // Black Link
     text-decoration: none;
     padding: 10px;
     transition: color 0.3s;
