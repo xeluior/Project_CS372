@@ -11,17 +11,17 @@ export default function Register() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        if(!isValidEmail(email) || !isValidEmail(email2)){
-            alert("Please enter a valid email!")
-        }
         if(email !== email2){
             alert("The emails entered do not match!")
         }
-        if(password === "" || password2 === ""){
-            alert("Please do not leave any password fields blank!")
+        else if(!isValidEmail(email) || !isValidEmail(email2)){
+            alert("Please enter a valid email!")
         }
         if(password !== password2){
             alert("The passwords do not match!")
+        }
+        else if(password === "" || password2 === ""){
+            alert("Please do not leave any password fields blank!")
         }
         //Backend code for actual account creation in the database
         //Make sure to check if the account already exists
