@@ -14,7 +14,7 @@ export default function Login() {
         if(password.length === ""){
             alert("Please enter a password!")
         }
-    };
+    }
 
 
     //Backend code to get session ID and check if username and password match
@@ -39,5 +39,5 @@ export default function Login() {
                     <RegisterLink to="/register">Don't have an account? Register here!</RegisterLink>
             </LoginForm>
         </Container>
-    );
+    )
 }
