@@ -1,15 +1,15 @@
-import React from "react";
-import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
-import Home from "./pages/home";
-import Filter from "./pages/filter";
-import Recommend from "./pages/recommend";
-import Login from "./pages/login";
-import Register from "./pages/register";
-import "./App.css";
+import React from "react"
+import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom"
+import Home from "./pages/home"
+import Filter from "./pages/filter"
+import Recommend from "./pages/recommend"
+import Login from "./pages/login"
+import Register from "./pages/register"
+import "./App.css"
 
 const linkStyle = {
   color: 'white'
-};
+}
 
 const App = () => {
   return (

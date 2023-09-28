@@ -1,39 +1,31 @@
-import React, { useState } from "react";
-import { Container, LoginForm, Input, Button, Title } from "../component/StyledComponents";
-import { isValidEmail } from "../functions";
-
-
+import React, { useState } from "react"
+import { Container, LoginForm, Input, Button, Title } from "../component/StyledComponents"
+import { isValidEmail } from "../lib/help_lib_functions"
 
 export default function Register() {
-    const [email, setEmail] = useState("");
-    const [email2, setEmail2] = useState("");
-    const [password, setPassword] = useState("");
-    const [password2, setPassword2] = useState("");
-    const [username, setUsername] = useState("");
-
+    const [email, setEmail] = useState("")
+    const [email2, setEmail2] = useState("")
+    const [password, setPassword] = useState("")
+    const [password2, setPassword2] = useState("")
+    const [username, setUsername] = useState("")
 
     const handleSubmit = (e) => {
         e.preventDefault();
         if(!isValidEmail(email) || !isValidEmail(email2)){
             alert("Please enter a valid email!")
         }
-        if(email != email2){
+        if(email !== email2){
             alert("The emails entered do not match!")
         }
         if(password === "" || password2 === ""){
             alert("Please do not leave any password fields blank!")
         }
-        if(password != password2){
+        if(password !== password2){
             alert("The passwords do not match!")
         }
-        
-
         //Backend code for actual account creation in the database
-
-
-
-    };
-
+        //Make sure to check if the account already exists
+    }
     return (
         <Container>
             <LoginForm onSubmit={handleSubmit}>
@@ -71,5 +63,5 @@ export default function Register() {
                 <Button type="submit">Register</Button>
             </LoginForm>
         </Container>
-    );
+    )
 }
