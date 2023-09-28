@@ -1,6 +1,7 @@
 // import modules
 const bcrypt = require('bcrypt')
 const crypto = require('crypto')
+const mongodb = require('mongodb')
 
 // configure the environment
 require('dotenv').config()
