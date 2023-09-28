@@ -34,6 +34,17 @@ exports.check_password = (req, res, next) => {
     })
 }
 
+// middleware for validating an existing session
+exports.check_token = (req, res, next) => {
+    sessions.findOne({ session_id: req.query.token }).then((val) => {
+        if (!val) {
+            res.sendStatus(403)
+        } else {
+            next()
+        }
+    })
+}
+
 // middleware for returning a session id
 exports.get_session_id = (req, res) => {
     // create a session id
