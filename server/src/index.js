@@ -49,17 +49,15 @@ app.get("/search", (req, res) => {
     return json response res.send */
     //get query
     
-    const filters = req.query;
-    const filteredTrope = media.filter(trope => {
-    //if query exists, return json response
-    let isValid = false;
-    for (key in filters) {
-        console.log(key, trope[key], filters[key]);
-        isValid = trope[key] === filters[key];
-    }
-    return isValid;
-    });
-    res.send(filteredTrope);
+    media.find({
+        /* TODO: filters */
+        $text: {
+            $search: req.query.title
+        }
+    })
+    .toArray()
+    .then((result) => {
+        res.send(result);
 
 });
 
