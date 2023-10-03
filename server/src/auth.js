@@ -17,50 +17,33 @@ const sessions = db.collection('sessions')
 // requires that the router or app use a body parser
 exports.check_password = (req, res, next) => {
     // get the user's hashed password
-    users.findOne({ username: req.body.username }).then((user) => {
+    users.findOne({ email: req.body.email }).then((user) => {
         // determine if password and hash match
         return bcrypt.compare(req.body.password, user.password)
     }).then((pwd_res) => {
         if (pwd_res) {
-            // call the next middleware only if the password is correct
-            next()
+            // store the email (uid) in the session and send to the target or the homepage
+            req.session.uid = req.body.email
+            res.redirect(303, req.query.redirect || '/')
         }
         else {
             // send FORBIDDEN otherwise
             res.sendStatus(403)
         }
-    }).catch(() => {
+    }).catch((err) => {
+        console.log(err)
         res.sendStatus(403)
     })
 }
 
 // middleware for validating an existing session
 exports.check_token = (req, res, next) => {
-    sessions.findOne({ session_id: req.query.token }).then((val) => {
-        if (!val) {
-            res.sendStatus(403)
-        } else {
+    users.findOne({ email: req.session.email }).then((user) => {
+        if (user) {
             next()
+        } else {
+            res.sendStatus(403)
         }
-    })
-}
-
-// middleware for returning a session id
-exports.get_session_id = (req, res) => {
-    // create a session id
-    crypto.randomBytes(session_id_bits, (err, buf) => {
-        if (err) throw err
-        let session_id = buf.toString('base64')
-
-        // store the session in MongoDB for later lookup
-        sessions.insertOne({
-            session_id: session_id,
-            username: req.body.username,
-            start_time: Date.now()
-        }).then(() => {
-            // send the session id to the frontend for saving in the browser
-            res.send(session_id)
-        })
     })
 }
 
@@ -70,22 +53,22 @@ exports.create_user = (req, res) => {
     bcrypt.hash(req.body.password, salt_rounds).then((hashed_pwd) => {
         // insert to mongo
         return users.insertOne({
-            username: req.body.username,
+            email: req.body.email,
             password: hashed_pwd
         })
     }).then(() => {
-        // send success after insert
-        res.send()
+        // send the user to the login screen
+        res.redirect(303, '/login')
     })
 }
 
 // middleware for removing user
 exports.delete_user = (req, res) => {
-    users.deleteOne({ username: req.body.username }).then(() => {
-        return sessions.deleteMany({ username: req.body.username })
-    }).then(() => {
-        // send NO CONTENT success after delete
-        res.sendStatus(204);
-    });
+    req.session.destroy(() => {
+        users.deleteOne({ email: req.body.email }).then(() => {
+            // redirect the user to the main page
+            res.redirect(303, '/')
+        })
+    })
     /* TODO: delete content associated with the user */
 }

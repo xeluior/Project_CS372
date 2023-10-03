@@ -10,7 +10,7 @@ const router = express.Router();
 router.use(body_parser.json());
 
 // login endpoint returns a session id after a successful password check
-router.post("/login", auth.check_password, auth.get_session_id);
+router.post("/login", auth.check_password);
 
 // create endpoint creates a new user with username and hashed password
 router.post("/create", auth.create_user);
