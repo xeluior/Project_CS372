@@ -57,5 +57,7 @@ app.get("/search", (req, res) => {
 })
 
 // start the app
-app.listen(port)
+app.listen(port, () => {
+    console.log(`Server listening on ${port}`)
+})
 
