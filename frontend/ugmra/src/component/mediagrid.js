@@ -1,7 +1,7 @@
 import React, { Component } from "react"
 import styled from "styled-components"
 import MediaPoster from "./mediaposter"
-// Styled components (unchanged)
+
 const GridContainer = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
@@ -10,7 +10,6 @@ const GridContainer = styled.div`
 
 class MediaGrid extends Component {
   render() {
-    // const { mediaData } = this.props // Accept media data as props
 
     return (
       <GridContainer>

@@ -1,7 +1,7 @@
 import React, { Component } from "react"
 import styled from "styled-components"
 
-// Styled components
+// These styled components were created by ChatGPT
 const Container = styled.div`
   width: 250px;
   height: 375px;
@@ -49,6 +49,7 @@ const Synopsis = styled.p`
   font-size: 1rem;
   text-align: center;
 `
+// End ChatGTP generated code
 
 class MediaPoster extends Component {
   constructor(props) {
