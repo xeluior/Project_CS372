@@ -27,7 +27,7 @@ const media = mongo.db(db_name).collection(collection_name);
 
 // use additional routes
 app.use(cors());
-app.use(auth.router);
+app.use('/auth', auth.router);
 
 // recommendation route
 // takes the "ns" and "id" query parameters to uniquely identify the media to get
