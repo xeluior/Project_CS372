@@ -1,7 +1,9 @@
 // module imports
-const express = require("express")
-const mongodb = require("mongodb")
-const auth = require('./auth.router.js')
+const express = require("express");
+const mongodb = require("mongodb");
+const session = require('express-session')
+const auth = require('./auth.router.js');
+const cors = require('cors');
 
 // environment configuration from .env file
 require("dotenv").config()
@@ -25,6 +27,12 @@ const mongo = new mongodb.MongoClient(process.env.MONGO_URI)
 const media = mongo.db(db_name).collection(collection_name)
 
 // use additional routes
+app.use(session({
+    secret: process.env.SESSION_SECRET,
+    saveUninitialized: false,
+    resave: false
+}))
+app.use(cors());
 app.use(express.static('../frontend/build'))
 app.use('/auth', auth.router)
 
