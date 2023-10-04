@@ -6,25 +6,25 @@ const auth = require('./auth.router.js');
 const cors = require('cors');
 
 // environment configuration from .env file
-require("dotenv").config();
+require("dotenv").config()
 
 // configuration constants
-const db_name = 'media';
-const collection_name = 'media';
+const db_name = 'media'
+const collection_name = 'media'
 
 // initialize the express app
-const app = express();
+const app = express()
 
 // define the port based on an environment variable
 // this will assist in deployment to Google Cloud
 // it defaults to 8080 for local development
-const port = process.env.PORT || 8080;
+const port = process.env.PORT || 8080
 
 // the MongoDB connection also uses an environment variable for security
 // defaults or hard codes should never happen since the connection string includes the password
 // this will fail if the environment variable is not present
-const mongo = new mongodb.MongoClient(process.env.MONGO_URI);
-const media = mongo.db(db_name).collection(collection_name);
+const mongo = new mongodb.MongoClient(process.env.MONGO_URI)
+const media = mongo.db(db_name).collection(collection_name)
 
 // use additional routes
 app.use(session({
@@ -33,7 +33,8 @@ app.use(session({
     resave: false
 }))
 app.use(cors());
-app.use('/auth', auth.router);
+app.use(express.static('../frontend/build'))
+app.use('/auth', auth.router)
 
 // recommendation route
 // takes the "ns" and "id" query parameters to uniquely identify the media to get
@@ -44,9 +45,9 @@ app.get("/recommendation", (req, res) => {
     })
     .then((result) => {
         /* TODO: actually recommend things */
-        res.send(result);
-    });
-});
+        res.send(result)
+    })
+})
 
 // search route
 // a "text" index needs to be made on the title field before this will work
@@ -59,10 +60,12 @@ app.get("/search", (req, res) => {
     })
     .toArray()
     .then((result) => {
-        res.send(result);
-    });
-});
+        res.send(result)
+    })
+})
 
 // start the app
-app.listen(port);
+app.listen(port, () => {
+    console.log(`Server listening on ${port}`)
+})
 
