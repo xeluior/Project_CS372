@@ -1,14 +1,11 @@
 //The recommend page for UGMRA (second screen)
-import React from "react";
-import TextInput from "../component/textinput";
-import Button from "../component/button";
-import "../App.css"; 
+import React from "react"
 
 const Recommend = () => {
     return (
-        <h1>Screen 3</h1>
-    );
+        <h1 style={{ color: 'white' }}>Screen 3</h1>
+    )
   }
   
-  export default Recommend;
+  export default Recommend
   
