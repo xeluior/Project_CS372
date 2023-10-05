@@ -52,6 +52,10 @@ app.get("/recommendation", (req, res) => {
 // search route
 // a "text" index needs to be made on the title field before this will work
 app.get("/search", (req, res) => {
+    /* recieve url request
+    return json response res.send */
+    //get query
+    
     media.find({
         /* TODO: filters */
         $text: {
