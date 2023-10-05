@@ -1,3 +1,6 @@
-PORT=8080
-MONGO_URI=mongodb+srv://username:password@example.mongodb.net/
-
+DB=
+USER_COLLECTION=
+MEDIA_COLLECTION=
+MONGO_URI=
+PORT=
+SESSION_SECRET=
