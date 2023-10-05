@@ -2,12 +2,6 @@ import React, { Component } from "react"
 import styled from "styled-components"
 import CheckBox from "./checkbox"
 
-// const Container = styled.div`
-//   display: flex;
-//   flex-direction: column;
-//   width: 100px;
-//   height: 50px;
-// `
 const Container = styled.div`
   display: grid;
   grid-template-rows: repeat(auto-fill, 20px);

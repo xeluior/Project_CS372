@@ -6,7 +6,7 @@ import FilterBox from "../component/filterbox"
 import styled from "styled-components"
 
 const Filter = () => {
-  var mediaData = [
+  let mediaData = [
     //An array of testing values. This will be replaced with a database call that returns a JSON object later
     {
       id: 1,
@@ -45,7 +45,7 @@ const Filter = () => {
     },
   ]
 
-  var checkboxData = [
+  let checkboxData = [
     {
       id: 1,
       text: "Filter 1",
