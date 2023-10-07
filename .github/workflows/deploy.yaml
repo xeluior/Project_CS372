@@ -52,6 +52,7 @@ jobs:
             DB=media-db
             MEDIA_COLLECTION=pages
             USERS_COLLECTION=users
+          flags: '--allow-unauthenticated'
       - name: output
         run: echo ${{ steps.deploy.outputs.url }}
 
