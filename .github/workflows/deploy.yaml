@@ -1,7 +1,7 @@
 name: Build and Deploy to Google Cloud
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "cloud" ]
 env:
   PROJECT_ID: UMGRA
   GCLOUD_REGION: us-central1
