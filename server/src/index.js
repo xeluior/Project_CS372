@@ -9,8 +9,8 @@ const cors = require('cors');
 require("dotenv").config()
 
 // configuration constants
-const db_name = 'media'
-const collection_name = 'media'
+const db_name = process.env.DB
+const collection_name = process.env.MEDIA_COLLECTION
 
 // initialize the express app
 const app = express()
@@ -33,7 +33,6 @@ app.use(session({
     resave: false
 }))
 app.use(cors());
-app.use(express.static('../frontend/build'))
 app.use('/auth', auth.router)
 
 // recommendation route
@@ -68,6 +67,8 @@ app.get("/search", (req, res) => {
     })
 })
 
+// server react from the server
+app.use(express.static('../frontend/build'))
 // start the app
 app.listen(port, () => {
     console.log(`Server listening on ${port}`)
