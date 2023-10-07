@@ -2,14 +2,14 @@ name: Build and Deploy to Google Cloud
 on:
   push:
     branches: [ "main", "cloud" ]
-env:
-  PROJECT_ID: UMGRA
-  GCLOUD_REGION: us-central1
-  GCLOUD_REGISTRY: "${{ env.GCLOUD_REGION }}-docker.pkg.dev"
-  IMAGE_TAG: "${{ env.GCLOUD_REGISTRY }}/${{ env.PROJECT_ID }}:${{ github.sha }}"
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    env:
+      PROJECT_ID: UMGRA
+      GCLOUD_REGION: us-central1
+      GCLOUD_REGISTRY: "${{ env.GCLOUD_REGION }}-docker.pkg.dev"
+      IMAGE_TAG: "${{ env.GCLOUD_REGISTRY }}/${{ env.PROJECT_ID }}:${{ github.sha }}"
     steps:
       - name: checkout
         uses: actions/checkout@v4
