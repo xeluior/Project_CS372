@@ -8,8 +8,8 @@ jobs:
     env:
       PROJECT_ID: UMGRA
       GCLOUD_REGION: us-central1
-      GCLOUD_REGISTRY: "${{ GCLOUD_REGION }}-docker.pkg.dev"
-      IMAGE_TAG: "${{ GCLOUD_REGISTRY }}/${{ PROJECT_ID }}:${{ github.sha }}"
+      GCLOUD_REGISTRY: us-central1-docker.pkg.dev
+      IMAGE_TAG: "us-central1-docker.pkg.dev/UMGRA:${{ github.sha }}"
     steps:
       - name: checkout
         uses: actions/checkout@v4
