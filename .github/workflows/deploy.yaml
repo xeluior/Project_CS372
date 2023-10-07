@@ -45,6 +45,13 @@ jobs:
           service: 'server'
           region: ${{ env.GCLOUD_REGION }}
           image: ${{ env.IMAGE_TAG }}
+          secrets: |
+            MONGO_URI=projects/544974938261/secrets/MONGO_URI
+            SESSION_SECRET=projects/544974938261/secrets/SESSION_SECRET
+          env_vars: |
+            DB=media-db
+            MEDIA_COLLECTION=pages
+            USERS_COLLECTION=users
       - name: output
         run: echo ${{ steps.deploy.outputs.url }}
 
