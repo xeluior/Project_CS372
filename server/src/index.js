@@ -39,7 +39,7 @@ app.use('/auth', auth.router)
 // takes the "ns" and "id" query parameters to uniquely identify the media to get
 app.get("/recommendation", (req, res) => {
     media.findOne({
-        namespace: req.query.ns,
+        ns: req.query.ns,
         id: req.query.id
     })
     .then((result) => {
