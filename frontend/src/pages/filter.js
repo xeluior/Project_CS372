@@ -1,49 +1,11 @@
 //The results/filtering page for UGMRA (second screen)
-import React from "react"
+import React, { useState, useEffect } from "react"
 import MediaGrid from "../component/mediagrid"
 import SearchBar from "../component/searchbar"
 import FilterBox from "../component/filterbox"
 import styled from "styled-components"
 
-const Filter = () => {
-  let mediaData = [
-    //An array of testing values. This will be replaced with a database call that returns a JSON object later
-    {
-      id: 1,
-      title: "Cars 2",
-      synopsis: "A movie about cars",
-      posterUrl:
-        "https://www.themoviedb.org/t/p/w600_and_h900_bestv2/iwKVo3HlsyVNXCzFEkd0xHz3kGi.jpg",
-    },
-    {
-      id: 1,
-      title: "Cars 3",
-      synopsis: "A movie about even more cars",
-      posterUrl:
-        "https://www.themoviedb.org/t/p/w600_and_h900_bestv2/iwKVo3HlsyVNXCzFEkd0xHz3kGi.jpg",
-    },
-    {
-      id: 1,
-      title: "Cars 3",
-      synopsis: "A movie about even more cars",
-      posterUrl:
-        "https://www.themoviedb.org/t/p/w600_and_h900_bestv2/iwKVo3HlsyVNXCzFEkd0xHz3kGi.jpg",
-    },
-    {
-      id: 1,
-      title: "Cars 3",
-      synopsis: "A movie about even more cars",
-      posterUrl:
-        "https://www.themoviedb.org/t/p/w600_and_h900_bestv2/iwKVo3HlsyVNXCzFEkd0xHz3kGi.jpg",
-    },
-    {
-      id: 1,
-      title: "Cars 3",
-      synopsis: "A movie about even more cars",
-      posterUrl:
-        "https://www.themoviedb.org/t/p/w600_and_h900_bestv2/iwKVo3HlsyVNXCzFEkd0xHz3kGi.jpg",
-    },
-  ]
+const Filter = () => { 
 
   let checkboxData = [
     {
@@ -55,22 +17,40 @@ const Filter = () => {
       text: "Filter 2",
     },
     {
-      id: 2,
+      id: 3,
       text: "Filter 3",
     },
     {
-      id: 2,
+      id: 4,
       text: "Filter 4",
     },
     {
-      id: 2,
+      id: 5,
       text: "Filter 5",
     },
     {
-      id: 2,
+      id: 6,
       text: "Filter 6",
     },
   ]
+
+  const [queryText, setQueryText, mediaData, setMediaData] = useState(0)
+  // const [] = useRef(0)
+
+  useEffect(() => {
+    //On page load
+    async function fetchData() {
+      setQueryText(window.sessionStorage.getItem("query"))
+
+      let response = await fetch(
+        "https://server-e2agagkjxa-uc.a.run.app/search?title=" + queryText
+      )
+      // mediaData.current = response.json()
+      // console.log(mediaData)
+      setMediaData(response.json())
+    }
+    fetchData()
+  })
 
   const WrapDiv = styled.div`
     display: flex;
@@ -92,7 +72,7 @@ const Filter = () => {
           />
         </div>
         <div>
-          <MediaGrid mediaData={mediaData} />
+          <MediaGrid mediaData={mediaData} /> {console.log(mediaData)}
         </div>
       </WrapDiv>
     </div>
