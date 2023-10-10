@@ -15,8 +15,8 @@ class MediaGrid extends Component {
       <GridContainer>
         {this.props.mediaData.map((mediaItem) => (
           <MediaPoster
-            title={mediaItem.id}
-            synopsis={mediaItem.id}
+            title={mediaItem.title}
+            synopsis={mediaItem.url}
             posterUrl={"mediaItem.posterUrl"}
           />
         ))}
