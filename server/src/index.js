@@ -68,6 +68,19 @@ app.get("/search", (req, res) => {
     })
 })
 
+//watch later function
+app.get("/watch-later", (req, res) => {
+    /*get user id based on token (session id)
+    add namespace:id of item to json attribute*/
+    //check if user is logged in
+    if (req.session.uid !== null) {
+        media.insertOne(req.query.id)
+    }
+    else {
+        res.sendStatus(403)
+    }
+});
+
 // start the app
 app.listen(port, () => {
     console.log(`Server listening on ${port}`)
