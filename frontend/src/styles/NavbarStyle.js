@@ -57,7 +57,7 @@ export const NavbarLink = styled(Link)`
 export const SearchPNG = styled.img`
     margin: 10px;
     max-width: 180px;
-    height: 50px;
+    height: 40px;
     vertical-align: middle;  // This ensures the image aligns with the middle of adjacent text or input elements
 
     &:hover {
