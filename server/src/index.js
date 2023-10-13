@@ -4,6 +4,7 @@ const mongodb = require("mongodb");
 const session = require('express-session')
 const auth = require('./auth.router.js');
 const cors = require('cors');
+const path = require('path')
 
 // environment configuration from .env file
 require("dotenv").config()
@@ -67,8 +68,15 @@ app.get("/search", (req, res) => {
     })
 })
 
-// server react from the server
-app.use(express.static('../frontend/build'))
+// serve static resources from the server
+const react_dist = path.join(__dirname, '../../frontend/build')
+app.use(express.static(react_dist))
+
+// redirect all unhandled requests to React-Router to handle
+app.get('*', (req, res) => {
+    res.sendFile('index.html', { root: react_dist })
+})
+
 // start the app
 app.listen(port, () => {
     console.log(`Server listening on ${port}`)
