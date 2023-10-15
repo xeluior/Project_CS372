@@ -11,8 +11,13 @@ class CheckBox extends Component {
     }
   }
 
+  componentDidMount() {
+    this.props.parentCallback({'id': this.props.boxID, 'ns': this.props.text, 'state': this.state.checked})
+  }
+
   handleChange = () => {
     this.setState({ checked: !this.state.checked })
+    this.props.parentCallback({'id': this.props.boxID, 'ns': this.props.text, 'state': this.state.checked})
   }
 
   render() {
@@ -20,8 +25,10 @@ class CheckBox extends Component {
       <div>
         <label>
           <StyledCheckbox
+            boxID={this.props.boxID}
             checked={this.state.checked}
             onChange={this.handleChange}
+            parentCallback={this.props.parentCallback}
           />
           <span> {this.props.text} </span>
         </label>

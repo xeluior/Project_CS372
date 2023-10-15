@@ -8,7 +8,7 @@ const WrapDiv = styled.div`
 `
 
 const SideDiv = styled.div`
-  width: 30%; //mayeb val instead
+  width: 15%; //mayeb val instead
   float: left;
   border-style: solid;
 `
