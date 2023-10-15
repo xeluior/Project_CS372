@@ -69,22 +69,49 @@ class Filter extends React.Component {
     await this.fetchDataFromDatabase()
   }
 
+  // Takes in the jsonified database query results and returns a list of the media namespaces in the results (Not tropes)
+  getFilterOptions(data)
+  {
+    let resultList = []
+
+    for (let i = 0; i < data.length; i++)
+    {
+      if(mediaNamespaces.includes(data[i]['ns']) && !(resultList.includes(data[i]['ns'])))// If the namespaece is a media namespace and is not already in our list
+      {
+        resultList.push(data[i]['ns'])
+      }
+    }
+
+    let jsonResult = [{}]
+
+    for (let i = 0; i < resultList.length; i++) // Formatting the result as a mappable object
+    {
+      jsonResult[i] = 
+      {
+        id: i,
+        text: resultList[i]
+      }
+    }
+
+    return jsonResult
+  }
+
   async fetchDataFromDatabase() {
     let qText = window.sessionStorage.getItem("query")
 
     const apiUrl = `${process.env.REACT_APP_API_URL}search?title=${qText}`
     try {
-      // Assuming you are using the fetch API to make a GET request to your database
       const response = await fetch(apiUrl)
       const data = await response.json()
-      this.setState({ mediaData: data }) // Set the retrieved data in the state
+      this.setState({ mediaData: data }) // Set the retrieved data in state
+      this.setState({checkboxData: this.getFilterOptions(data)}) // Set filter options in state
 
-      // return data
     } catch (error) {
-      console.error("Error fetching data from the database:", error)
+      console.error("Error fetching data from the database: ", error)
     }
   }
-  // Returns a json object array of all elements that do not contain any of the namespaces in namespaceList
+
+  // Returns a json object array of all elements that do not contain any of the namespaces in filterList
   filterMediaNamespaces(jsonArray, filterList) {
     //NOTE: This list only contains namespaces that hold media, not tropes.
     let allNameSpaces = {
@@ -149,7 +176,7 @@ class Filter extends React.Component {
   }
 
   render() {
-    const { mediaData } = this.state
+    const { mediaData, checkboxData } = this.state
 
     return (
       <div>
@@ -157,18 +184,17 @@ class Filter extends React.Component {
           <SearchBar />
         </div>
         <WrapDiv>
-          <div>
-            {/* <FilterBox
+          <div> 
+            {mediaData ? ( <FilterBox
             leftContent={checkboxData}
-            centerContent={checkboxData}
-            rightContent={checkboxData}
-          /> */}
-          </div>
-          <div>
+            // centerContent={checkboxData}
+            // rightContent={checkboxData}
+          />) : <p>Loading filters...</p>}
+          
             {mediaData ? (
-              <MediaGrid mediaData={this.filterMediaNamespaces(mediaData, [])} />
+              <MediaGrid mediaData={this.filterMediaNamespaces(mediaData, [])} /> 
             ) : (
-              <p>Loading data...</p>
+              <p>Loading results...</p>
             )}
           </div>
         </WrapDiv>

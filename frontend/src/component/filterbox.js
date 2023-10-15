@@ -23,12 +23,12 @@ class FilterBox extends Component {
         <SideDiv>
           <CheckBoxList checkboxData={leftContent} /> 
         </SideDiv>
-        <SideDiv>
+        {/* <SideDiv>
           <CheckBoxList checkboxData={centerContent} />
         </SideDiv>
         <SideDiv>
           <CheckBoxList checkboxData={rightContent} />
-        </SideDiv>
+        </SideDiv> */}
       </WrapDiv>
     )
   }
