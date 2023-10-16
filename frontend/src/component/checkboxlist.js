@@ -17,29 +17,33 @@ class CheckBoxList extends Component {
   }
 
   handleCallback = (checkbox) => {
-    const { checkboxes } = this.state;
-  
-    const updatedCheckboxes = [...checkboxes];
-  
-    const existingIndex = checkboxes.findIndex((c) => c.id === checkbox.id);
-  
+    const { checkboxes } = this.state
+
+    const updatedCheckboxes = [...checkboxes]
+
+    const existingIndex = checkboxes.findIndex((c) => c.id === checkbox.id)
+
     if (existingIndex === -1) {
-      updatedCheckboxes.push(checkbox);
+      updatedCheckboxes.push(checkbox)
     } else {
-      updatedCheckboxes[existingIndex] = checkbox;
+      updatedCheckboxes[existingIndex] = checkbox
     }
-  
+
     this.setState({ checkboxes: updatedCheckboxes }, () => {
-      console.log(this.state.checkboxes);
-    });
+      this.props.dataCallback(updatedCheckboxes) // Pass data to parent 
+    })
   }
-  
 
   render() {
     return (
       <Container>
         {this.props.checkboxData.map((item) => (
-          <CheckBox boxID={item['id']} text={item.text} parentCallback={this.handleCallback} />
+          <CheckBox
+            boxid={item["id"]}
+            text={item.text}
+            parentCallback={this.handleCallback}
+            dataCallback={this.props.dataCallback}
+          />
         ))}
       </Container>
     )
