@@ -58,6 +58,7 @@ class Filter extends React.Component {
     super(props)
     this.state = {
       queryText: "",
+      queryResult: null,
       mediaData: null,
       checkboxData: null,
       filterData: [],
@@ -112,6 +113,7 @@ class Filter extends React.Component {
     try {
       const response = await fetch(apiUrl)
       const data = await response.json()
+      this.setState({ queryResult: data })
       this.setState({ mediaData: data }) // Set the retrieved data in state
       this.setState({ checkboxData: this.getFilterOptions(data) }) // Set filter options in state
     } catch (error) {
@@ -130,9 +132,7 @@ class Filter extends React.Component {
       }) //Get list of all filter options in format {'ns': music, 'state': true}
     }
 
-    // filterList[0]["state"] = true //Set first/single element to true, workaround for unexpected behavior
-
-    //Cross reference allNameSpaces with filterList
+    //Cross reference allowedNamespaces with filterList
     for (let i = 0; i < filterList.length; i++) {
       if (filterList[i]["state"] === false) {
         allowedNamespaces.splice([filterList[i]["id"]], 1) //remove element if its state in the filter list is false
@@ -146,6 +146,8 @@ class Filter extends React.Component {
       let indexFlag = false
       for (let k = 0; k < allowedNamespaces.length; k++) 
       {
+        console.log(mediaArray[i]['title'], ", ", mediaArray[i]['ns'], " === ", allowedNamespaces[k]['ns'], "  =  ", mediaArray[i]["ns"] === allowedNamespaces[k]["ns"])
+        console.log(allowedNamespaces)
         if (mediaArray[i]["ns"] === allowedNamespaces[k]["ns"]) 
         {
           indexFlag = true
@@ -156,7 +158,6 @@ class Filter extends React.Component {
         resultArray.push(mediaArray[i])
       }
     }
-
     return resultArray
   }
 
@@ -170,7 +171,7 @@ class Filter extends React.Component {
     try {
       if (prevState.filterData !== this.state.filterData) {
         const result = this.filterMediaNamespaces(
-          this.state.mediaData,
+          this.state.queryResult,
           this.state.filterData
         )
 
