@@ -27,6 +27,7 @@ exports.check_password = (req, res, next) => {
             res.redirect(303, req.query.redirect || '/')
         }
         else {
+            console.log(`Invalid login attempt from ${req.ip}`)
             // send FORBIDDEN otherwise
             res.sendStatus(403)
         }
