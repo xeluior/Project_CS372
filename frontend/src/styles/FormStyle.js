@@ -63,7 +63,7 @@ export const RegisterLink = styled(Link)`
     transition: color 0.3s;
 
     &:hover {
-        color: ##0000EE;  // Darker green on hover
+        color: #0000EE;  // Darker green on hover
         text-decoration: underline;
     }
 `;
