@@ -69,9 +69,9 @@ class Filter extends React.Component {
 
   async componentDidMount() {
     // Fetch data from the database when the component mounts and reset filter data
-    this.setState({filterData: []})
-    this.setState({checkboxData: null})
-    
+    this.setState({ filterData: [] })
+    this.setState({ checkboxData: null })
+
     await this.fetchDataFromDatabase()
   }
 
@@ -120,51 +120,59 @@ class Filter extends React.Component {
   }
 
   // Returns a json object array of all elements that do not contain any of the namespaces in filterList
-  filterMediaNamespaces(jsonArray, filterList) {
-    //NOTE: This list only contains namespaces that hold media, not tropes.
+  filterMediaNamespaces(mediaArray, filterList) {
+    let allowedNamespaces = []
 
-    let allNameSpaces = []
-
-    for(let i = 0; i < this.state.checkboxData.length; i++)
-    {
-      allNameSpaces[this.state.checkboxData[i]] = true // Stopped here! 
+    for (let i = 0; i < this.state.checkboxData.length; i++) {
+      allowedNamespaces.push({
+        ns: this.state.checkboxData[i]["text"],
+        state: true,
+      }) //Get list of all filter options in format {'ns': music, 'state': true}
     }
 
-    allNameSpaces.shift()
+    // filterList[0]["state"] = true //Set first/single element to true, workaround for unexpected behavior
 
+    //Cross reference allNameSpaces with filterList
     for (let i = 0; i < filterList.length; i++) {
       if (filterList[i]["state"] === false) {
-        allNameSpaces[filterList[i]['ns']] = false // Mark elements from filterList as false
-        console.log("Filtered out namespace: ", filterList[i]["ns"])
+        allowedNamespaces.splice([filterList[i]["id"]], 1) //remove element if its state in the filter list is false
       }
     }
-    console.log("ALLSPACES: ", allNameSpaces)
-    let resultArray = []
-    let resultArrayIndex = 0
 
-    for (let i = 0; i < jsonArray.length; i++) {
-      if (allNameSpaces[jsonArray[i]["ns"]] === true) {
-        // If element from jsonArray is on allowed list (i.e. not in filterList)
-        resultArray[resultArrayIndex++] = jsonArray[i]
+    //Cross reference allNameSpaces with mediadata to filter out unwanted data
+    let resultArray = []
+    for (let i = 0; i < mediaArray.length; i++) 
+    {
+      let indexFlag = false
+      for (let k = 0; k < allowedNamespaces.length; k++) 
+      {
+        if (mediaArray[i]["ns"] === allowedNamespaces[k]["ns"]) 
+        {
+          indexFlag = true
+        }
+      }
+      if (indexFlag) 
+      {
+        resultArray.push(mediaArray[i])
+      }
     }
-    }
-    console.log("Checkbox Data: ", this.state.checkboxData)
-    console.log("Result from Filtering: ", resultArray)
+
     return resultArray
   }
 
   // Callback method that goes from filter.js -> filterbox.js -> checkboxlist.js -> checkbox.js to return checkboxes' data
   passDataToFilter(data) {
-    this.setState({ filterData: data }, () => {
-      console.log("FilterData: ", data)
-    })
+    this.setState({ filterData: data })
   }
 
-  // Called whenever filterdata's state has changed 
+  // Called whenever filterdata's state has changed
   componentDidUpdate(prevProps, prevState) {
     try {
       if (prevState.filterData !== this.state.filterData) {
-        const result = this.filterMediaNamespaces(this.state.mediaData, this.state.filterData)
+        const result = this.filterMediaNamespaces(
+          this.state.mediaData,
+          this.state.filterData
+        )
 
         if (result) {
           this.setState({ mediaData: null })
