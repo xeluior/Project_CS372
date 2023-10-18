@@ -14,7 +14,7 @@ class SearchBar extends React.Component {
   }
 
   render() {
-    const { query } = this.state
+    const { _query } = this.state
     return (
       <div>
         <TextInput
