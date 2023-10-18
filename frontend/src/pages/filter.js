@@ -2,13 +2,17 @@
 import React from "react"
 import MediaGrid from "../component/mediagrid"
 import SearchBar from "../component/searchbar"
-import FilterBox from "../component/filterbox"
 import styled from "styled-components"
+import CheckboxList from "../component/checkboxlist"
 
 const WrapDiv = styled.div`
   display: flex;
   flex-direction: column;
   gap: 20px;
+`
+
+const WhiteText = styled.p`
+  color: white;
 `
 // All media related namespaces on the tvtropes site.
 let mediaNamespaces = [
@@ -58,7 +62,7 @@ class Filter extends React.Component {
     super(props)
     this.state = {
       queryText: "",
-      queryResult: null,
+      // queryResult: null,
       mediaData: null,
       nonTropeData: null,
       checkboxData: null,
@@ -96,7 +100,7 @@ class Filter extends React.Component {
     for (let i = 0; i < resultList.length; i++) {
       jsonResult[i] = {
         id: i,
-        text: resultList[i],
+        label: resultList[i],
       }
     }
 
@@ -118,7 +122,7 @@ class Filter extends React.Component {
     try {
       const response = await fetch(apiUrl)
       const data = await response.json()
-      this.setState({ queryResult: data })
+      // this.setState({ queryResult: data })
       this.setState({ mediaData: data }) // Set the retrieved data in state
       this.setState({ checkboxData: this.getFilterOptions(data) }) // Set filter options in state
       this.setState({ nonTropeData: this.filterOutTropes(data) })
@@ -142,8 +146,10 @@ class Filter extends React.Component {
 
   // Returns a json object array of all elements that do not contain any of the namespaces in filterList
   filterMediaNamespaces(mediaArray, filterList) {
-    let allowedNamespaces = []
+    console.log("MEDIAARRAY: ", mediaArray)
+    console.log("FILTERLIST: ", filterList)
 
+    /*
     for (let i = 0; i < this.state.checkboxData.length; i++) {
       allowedNamespaces.push({
         ns: this.state.checkboxData[i]["text"],
@@ -171,7 +177,7 @@ class Filter extends React.Component {
         resultArray.push(mediaArray[i])
       }
     }
-    return resultArray
+    return resultArray */
   }
 
   // Callback method that goes from filter.js -> filterbox.js -> checkboxlist.js -> checkbox.js to return checkboxes' data
@@ -209,18 +215,14 @@ class Filter extends React.Component {
         <WrapDiv>
           <div>
             {mediaData ? (
-              <FilterBox
-                passDataToFilter={this.passDataToFilter}
-                leftContent={checkboxData}
-              />
+              <CheckboxList items={checkboxData} />
             ) : (
-              <p>Loading filters...</p>
+              <WhiteText>Loading filters...</WhiteText>
             )}
-
             {mediaData ? (
               <MediaGrid mediaData={mediaData} />
             ) : (
-              <p>Loading results...</p>
+              <WhiteText>Loading results...</WhiteText>
             )}
           </div>
         </WrapDiv>
