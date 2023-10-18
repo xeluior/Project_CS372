@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import { Container, LoginForm, Input, Button, Title } from "../component/StyledComponents"
+import { Container, LoginForm, Input, Button, Title } from "../styles/FormStyle"
 import { isValidEmail } from "../lib/help_lib_functions"
 
 export default function Register() {
