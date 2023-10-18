@@ -60,6 +60,7 @@ class Filter extends React.Component {
       queryText: "",
       queryResult: null,
       mediaData: null,
+      nonTropeData: null,
       checkboxData: null,
       filterData: [],
       namespaceData: null,
@@ -76,7 +77,7 @@ class Filter extends React.Component {
     await this.fetchDataFromDatabase()
   }
 
-  // Takes in the jsonified database query results and returns a list of the media namespaces in the results (Not tropes)
+  // Takes in the jsonified database query results and returns a list of the media namespaces in the results (Not tropes) for creating checkboxes
   getFilterOptions(data) {
     let resultList = []
 
@@ -120,9 +121,23 @@ class Filter extends React.Component {
       this.setState({ queryResult: data })
       this.setState({ mediaData: data }) // Set the retrieved data in state
       this.setState({ checkboxData: this.getFilterOptions(data) }) // Set filter options in state
+      this.setState({ nonTropeData: this.filterOutTropes(data) })
     } catch (error) {
       console.error("Error fetching data from the database: ", error)
     }
+  }
+
+  //Removes all query results that are not in media namespaces
+  filterOutTropes(allMediaArray) {
+    let result = []
+
+    for (let i = 0; i < allMediaArray.length; i++) {
+      if (mediaNamespaces.includes(allMediaArray[i]["ns"])) {
+        result.push(allMediaArray[i])
+      }
+    }
+
+    return result
   }
 
   // Returns a json object array of all elements that do not contain any of the namespaces in filterList
@@ -169,7 +184,7 @@ class Filter extends React.Component {
     try {
       if (prevState.filterData !== this.state.filterData) {
         const result = this.filterMediaNamespaces(
-          this.state.queryResult,
+          this.state.nonTropeData,
           this.state.filterData
         )
 
