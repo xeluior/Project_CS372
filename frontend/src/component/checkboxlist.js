@@ -1,6 +1,5 @@
 import React, { Component } from "react"
 import styled from "styled-components"
-// import CheckBox from "./checkbox"
 
 const Container = styled.div`
   display: grid;
@@ -22,11 +21,6 @@ class CheckboxList extends Component {
     }
   }
 
-  getUncheckedItems = () => {
-    const { items, checkedItems } = this.state
-    return items.filter((item) => !checkedItems.has(item.id))
-  }
-
   handleCheckboxChange = (itemId) => {
     const { checkedItems } = this.state
     if (checkedItems.has(itemId)) {
@@ -35,6 +29,17 @@ class CheckboxList extends Component {
       checkedItems.add(itemId)
     }
     this.setState({ checkedItems })
+    this.handleUncheckedItemsCallback()
+  }
+
+  getUncheckedItems = () => {
+    const { items, checkedItems } = this.state
+    return items.filter((item) => !checkedItems.has(item.id))
+  }
+
+  handleUncheckedItemsCallback = () => {
+    const uncheckedItems = this.getUncheckedItems()
+    this.props.onUncheckedItems(uncheckedItems) // Pass unchecked items to the parent component
   }
 
   render() {
@@ -51,7 +56,7 @@ class CheckboxList extends Component {
                   checked={checkedItems.has(item.id)}
                   onChange={() => this.handleCheckboxChange(item.id)}
                 />
-                {item.label} {console.log(this.getUncheckedItems())}
+                {item.label}
               </label>
             </div>
           ))}

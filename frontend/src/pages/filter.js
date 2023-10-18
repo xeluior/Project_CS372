@@ -66,11 +66,11 @@ class Filter extends React.Component {
       mediaData: null,
       nonTropeData: null,
       checkboxData: null,
-      filterData: [],
+      filterData: [], //Data returned from checkboxlist.js callback (All currently unchecked boxes)
       namespaceData: null,
     }
 
-    this.passDataToFilter = this.passDataToFilter.bind(this)
+    this.getUncheckedFilters = this.getUncheckedFilters.bind(this)
   }
 
   async componentDidMount() {
@@ -118,7 +118,6 @@ class Filter extends React.Component {
       apiUrl = `${process.env.REACT_APP_API_URL}search?title=${qText}`
     }
 
-    console.log("API: ", apiUrl)
     try {
       const response = await fetch(apiUrl)
       const data = await response.json()
@@ -149,40 +148,27 @@ class Filter extends React.Component {
     console.log("MEDIAARRAY: ", mediaArray)
     console.log("FILTERLIST: ", filterList)
 
-    /*
-    for (let i = 0; i < this.state.checkboxData.length; i++) {
-      allowedNamespaces.push({
-        ns: this.state.checkboxData[i]["text"],
-        state: true,
-      }) //Get list of all filter options in format {'ns': music, 'state': true}
-    }
-
-    //Cross reference allowedNamespaces with filterList
-    for (let i = 0; i < filterList.length; i++) {
-      if (filterList[i]["state"] === false) {
-        allowedNamespaces.splice([filterList[i]["id"]], 1) //remove element if its state in the filter list is false
-      }
-    }
-
-    //Cross reference allNameSpaces with mediadata to filter out unwanted data
     let resultArray = []
+
     for (let i = 0; i < mediaArray.length; i++) {
-      let indexFlag = false
-      for (let k = 0; k < allowedNamespaces.length; k++) {
-        if (mediaArray[i]["ns"] === allowedNamespaces[k]["ns"]) {
-          indexFlag = true
+      let validFlag = true
+      for (let k = 0; k < filterList.length; k++) {
+        if (mediaArray[i]["ns"] === filterList[k]["label"]) {
+          validFlag = false
         }
       }
-      if (indexFlag) {
+      if (validFlag) {
         resultArray.push(mediaArray[i])
       }
     }
-    return resultArray */
+
+    console.log("RESULT: ", resultArray)
+    return resultArray
   }
 
-  // Callback method that goes from filter.js -> filterbox.js -> checkboxlist.js -> checkbox.js to return checkboxes' data
-  passDataToFilter(data) {
-    this.setState({ filterData: data })
+  getUncheckedFilters(uncheckedItems) {
+    this.setState({ filterData: uncheckedItems }) // [{id: 4, label: 'Ride'}, {id: 5, label: 'Music'}]
+    // console.log("Get Unchecked Filters Event Fired")
   }
 
   // Called whenever filterdata's state has changed
@@ -215,7 +201,10 @@ class Filter extends React.Component {
         <WrapDiv>
           <div>
             {mediaData ? (
-              <CheckboxList items={checkboxData} />
+              <CheckboxList
+                items={checkboxData}
+                onUncheckedItems={this.getUncheckedFilters}
+              />
             ) : (
               <WhiteText>Loading filters...</WhiteText>
             )}
