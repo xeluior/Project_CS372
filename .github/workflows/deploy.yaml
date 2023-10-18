@@ -1,0 +1,58 @@
+name: Build and Deploy to Google Cloud
+on:
+  push:
+    branches: [ "main", "cloud" ]
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      PROJECT_ID: UMGRA
+      GCLOUD_REGION: us-central1
+      GCLOUD_REGISTRY: us-central1-docker.pkg.dev
+      IMAGE_TAG: "us-central1-docker.pkg.dev/umgra-400217/containers/server:${{ github.sha }}"
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+      - name: google auth
+        id: auth
+        uses: google-github-actions/auth@v1
+        with:
+          token_format: 'access_token'
+          credentials_json: ${{ secrets.GCLOUD_SERVICE_KEY }}
+      - name: container registry auth
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.GCLOUD_REGISTRY }}
+          password: ${{ steps.auth.outputs.access_token }}
+          username: 'oauth2accesstoken'
+      - name: install npm
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - name: install dependencies and build react
+        run: |
+          cd frontend
+          npm install
+          npm run build 
+      - name: build and push image
+        run: |
+          docker build -t ${{ env.IMAGE_TAG }} ./
+          docker push ${{ env.IMAGE_TAG }}
+      - name: deploy
+        id: deploy
+        uses: google-github-actions/deploy-cloudrun@v1
+        with:
+          service: 'server'
+          region: ${{ env.GCLOUD_REGION }}
+          image: ${{ env.IMAGE_TAG }}
+          secrets: |
+            MONGO_URI=projects/544974938261/secrets/MONGO_URI
+            SESSION_SECRET=projects/544974938261/secrets/SESSION_SECRET
+          env_vars: |
+            DB=media-db
+            MEDIA_COLLECTION=pages
+            USERS_COLLECTION=users
+          flags: '--allow-unauthenticated'
+      - name: output
+        run: echo ${{ steps.deploy.outputs.url }}
+

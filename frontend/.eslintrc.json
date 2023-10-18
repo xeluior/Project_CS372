@@ -1,0 +1,6 @@
+{
+    "rules": {
+        "no-unused-vars": ["warn", { "varsIgnorePattern": "^_" }],
+        "no-control-regex": "off"
+    }
+}

@@ -16,6 +16,6 @@ router.post("/login", auth.check_password);
 router.post("/create", auth.create_user);
 
 // delete endpoint deletes the user after reauthenticating them
-router.post("/delete", auth.check_password, auth.delete_user);
+router.post("/delete", auth.delete_user);
 
 exports.router = router;

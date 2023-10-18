@@ -4,13 +4,14 @@ const mongodb = require("mongodb");
 const session = require('express-session')
 const auth = require('./auth.router.js');
 const cors = require('cors');
+const path = require('path')
 
 // environment configuration from .env file
 require("dotenv").config()
 
 // configuration constants
-const db_name = 'media'
-const collection_name = 'media'
+const db_name = process.env.DB
+const collection_name = process.env.MEDIA_COLLECTION
 
 // initialize the express app
 const app = express()
@@ -33,14 +34,13 @@ app.use(session({
     resave: false
 }))
 app.use(cors());
-app.use(express.static('../frontend/build'))
 app.use('/auth', auth.router)
 
 // recommendation route
 // takes the "ns" and "id" query parameters to uniquely identify the media to get
 app.get("/recommendation", (req, res) => {
     media.findOne({
-        namespace: req.query.ns,
+        ns: req.query.ns,
         id: req.query.id
     })
     .then((result) => {
@@ -66,6 +66,15 @@ app.get("/search", (req, res) => {
     .then((result) => {
         res.send(result)
     })
+})
+
+// serve static resources from the server
+const react_dist = path.join(__dirname, '../../frontend/build')
+app.use(express.static(react_dist))
+
+// redirect all unhandled requests to React-Router to handle
+app.get('*', (req, res) => {
+    res.sendFile('index.html', { root: react_dist })
 })
 
 // start the app
