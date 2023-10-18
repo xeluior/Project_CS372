@@ -4,16 +4,17 @@ import { Link } from "react-router-dom";
 
 export const NavbarContainer = styled.nav`
     width: 100%;
+    max-width: 1500px; /* Adjust this value to the desired maximum width of the navbar */
+    margin: 10px auto; /* Centers the navbar horizontally with equal margin on left and right */
     height: 50px;
     background-color: #48BB78;
     display: flex;
     border-radius: 15px;
     flex-direction: column;
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); // This adds a shadow below the navbar
-    margin: 10px 0;  // This gives some space above and below the navbar
     position: relative;  // Ensures the navbar is above other elements
     z-index: 1;  // Keeps the navbar on top
-`
+`;
 
 export const LeftContainer = styled.div`
     flex: 60%;
