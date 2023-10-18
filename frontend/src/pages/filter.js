@@ -62,7 +62,6 @@ class Filter extends React.Component {
     super(props)
     this.state = {
       queryText: "",
-      // queryResult: null,
       mediaData: null,
       nonTropeData: null,
       checkboxData: null,
@@ -121,7 +120,6 @@ class Filter extends React.Component {
     try {
       const response = await fetch(apiUrl)
       const data = await response.json()
-      // this.setState({ queryResult: data })
       this.setState({ mediaData: data }) // Set the retrieved data in state
       this.setState({ checkboxData: this.getFilterOptions(data) }) // Set filter options in state
       this.setState({ nonTropeData: this.filterOutTropes(data) })
@@ -145,8 +143,6 @@ class Filter extends React.Component {
 
   // Returns a json object array of all elements that do not contain any of the namespaces in filterList
   filterMediaNamespaces(mediaArray, filterList) {
-    console.log("MEDIAARRAY: ", mediaArray)
-    console.log("FILTERLIST: ", filterList)
 
     let resultArray = []
 
@@ -162,13 +158,11 @@ class Filter extends React.Component {
       }
     }
 
-    console.log("RESULT: ", resultArray)
     return resultArray
   }
 
   getUncheckedFilters(uncheckedItems) {
     this.setState({ filterData: uncheckedItems }) // [{id: 4, label: 'Ride'}, {id: 5, label: 'Music'}]
-    // console.log("Get Unchecked Filters Event Fired")
   }
 
   // Called whenever filterdata's state has changed
