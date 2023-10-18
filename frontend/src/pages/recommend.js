@@ -9,7 +9,7 @@ import {
   BackButton,
 } from "../styles/recommendStyle";
 
-import _relatedMovies from "../component/relatedMovies.js"; 
+import relatedMovies from "../component/relatedMovies.js"; 
 
 const MovieDetail = () => {
   const movie = {
