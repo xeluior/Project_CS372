@@ -91,12 +91,8 @@ class Filter extends React.Component {
     }
 
     let jsonResult = [{}]
-
-    for (
-      let i = 0;
-      i < resultList.length;
-      i++ // Formatting the result as a mappable object
-    ) {
+    // Formatting the result as a mappable object
+    for (let i = 0; i < resultList.length; i++) {
       jsonResult[i] = {
         id: i,
         text: resultList[i],
@@ -109,7 +105,15 @@ class Filter extends React.Component {
   async fetchDataFromDatabase() {
     let qText = window.sessionStorage.getItem("query")
 
-    const apiUrl = `${process.env.REACT_APP_API_URL}search?title=${qText}`
+    let apiUrl
+    // If statement allows the app to function in testing and prod by checking for the .env var REACT_APP_API_URL, which is only present on the testing side
+    if (process.env.REACT_APP_API_URL === undefined) {
+      apiUrl = `${window.location.href}/search?title=${qText}`
+    } else {
+      apiUrl = `${process.env.REACT_APP_API_URL}search?title=${qText}`
+    }
+
+    console.log("API: ", apiUrl)
     try {
       const response = await fetch(apiUrl)
       const data = await response.json()
@@ -141,20 +145,14 @@ class Filter extends React.Component {
 
     //Cross reference allNameSpaces with mediadata to filter out unwanted data
     let resultArray = []
-    for (let i = 0; i < mediaArray.length; i++) 
-    {
+    for (let i = 0; i < mediaArray.length; i++) {
       let indexFlag = false
-      for (let k = 0; k < allowedNamespaces.length; k++) 
-      {
-        console.log(mediaArray[i]['title'], ", ", mediaArray[i]['ns'], " === ", allowedNamespaces[k]['ns'], "  =  ", mediaArray[i]["ns"] === allowedNamespaces[k]["ns"])
-        console.log(allowedNamespaces)
-        if (mediaArray[i]["ns"] === allowedNamespaces[k]["ns"]) 
-        {
+      for (let k = 0; k < allowedNamespaces.length; k++) {
+        if (mediaArray[i]["ns"] === allowedNamespaces[k]["ns"]) {
           indexFlag = true
         }
       }
-      if (indexFlag) 
-      {
+      if (indexFlag) {
         resultArray.push(mediaArray[i])
       }
     }
