@@ -1,36 +1,32 @@
 //A bundling of the button & textinput components needed to allow the text input to be passed to the button
-import React from "react";
-import Button from "./button";
-import TextInput from "./textinput";
+import React from "react"
+import Button from "./button"
+import TextInput from "./textinput"
+import { Link } from "react-router-dom"
 
 class SearchBar extends React.Component {
   state = {
     query: "",
-  };
+  }
 
   handleCallback = (data) => {
-    this.setState({ query: data });
-  };
+    this.setState({ query: data })
+  }
 
   render() {
-    const { query } = this.state;
+    const { query } = this.state
     return (
       <div>
         <TextInput
           placeHolderText="Search..."
-          parentCallback={this.handleCallback} 
+          parentCallback={this.handleCallback}
         />
-        <Button
-          type="button"
-          buttonText="Search"
-          className="search_button"
-          clickEvent={() => {
-            window.location.href = "/filter?q=" + query;
-          }}
-        />
+        <Link to="/filter">
+          <Button type="button" buttonText="Search" className="search_button" />
+        </Link>
       </div>
-    );
+    )
   }
 }
 
-export default SearchBar;
+export default SearchBar

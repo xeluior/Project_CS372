@@ -8,26 +8,33 @@ const WrapDiv = styled.div`
 `
 
 const SideDiv = styled.div`
-  width: 30%; //mayeb val instead
+  width: 20%; //mayeb val instead
   float: left;
   border-style: solid;
 `
 
 class FilterBox extends Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      checkboxes: [], //array of all of the checkbox values and if they are checked or not
+    }
+
+    this.handleCallback = this.handleCallback.bind(this)
+  }
+
+  handleCallback(data) {
+    this.setState({checkboxes: data})
+    this.props.passDataToFilter(data)
+  }
 
   render() {
-    const { leftContent, centerContent, rightContent } = this.props // Each prop is a JSON obj of the filter names
+    const { leftContent } = this.props // Each prop is a JSON obj of the filter names
 
     return (
       <WrapDiv>
         <SideDiv>
-          <CheckBoxList checkboxData={leftContent} /> 
-        </SideDiv>
-        <SideDiv>
-          <CheckBoxList checkboxData={centerContent} />
-        </SideDiv>
-        <SideDiv>
-          <CheckBoxList checkboxData={rightContent} />
+          <CheckBoxList checkboxData={leftContent} dataCallback={this.handleCallback} />
         </SideDiv>
       </WrapDiv>
     )
