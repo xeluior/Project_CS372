@@ -14,11 +14,7 @@ class SearchBar extends React.Component {
   }
 
   render() {
-<<<<<<< Updated upstream
-    const { query } = this.state
-=======
-    const { _query } = this.state;
->>>>>>> Stashed changes
+    const { _query } = this.state
     return (
       <div>
         <TextInput
