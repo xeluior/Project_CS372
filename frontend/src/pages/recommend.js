@@ -9,7 +9,9 @@ import {
   BackButton,
 } from "../styles/recommendStyle";
 
-import _relatedMovies from "../component/relatedMovies.js"; 
+import RelatedMovies from "../component/relatedMovies";
+
+
 
 const MovieDetail = () => {
   const movie = {
@@ -32,7 +34,7 @@ const MovieDetail = () => {
           <BackButton onClick={() => window.history.back()}>Go Back</BackButton>
         </MovieDetails>
       </MoviePageContainer>
-      <relatedMovies />
+      <RelatedMovies></RelatedMovies>
     </div>
   );
 };
