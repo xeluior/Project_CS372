@@ -112,7 +112,11 @@ class Filter extends React.Component {
     let apiUrl
     // If statement allows the app to function in testing and prod by checking for the .env var REACT_APP_API_URL, which is only present on the testing side
     if (process.env.REACT_APP_API_URL === undefined) {
-      apiUrl = `${window.location.href}/search?title=${qText}`
+      const currentUrl = window.location.href // Get the current URL
+      const endIndex = currentUrl.lastIndexOf(".app") // Find the last occurrence of ".app"
+      const modifiedUrl = (endIndex >= 0 ? currentUrl.slice(0, endIndex + 4) : currentUrl) // If not found, leave URL untouched. 
+
+      apiUrl = `${modifiedUrl}/search?title=${qText}`
     } else {
       apiUrl = `${process.env.REACT_APP_API_URL}search?title=${qText}`
     }
@@ -143,7 +147,6 @@ class Filter extends React.Component {
 
   // Returns a json object array of all elements that do not contain any of the namespaces in filterList
   filterMediaNamespaces(mediaArray, filterList) {
-
     let resultArray = []
 
     for (let i = 0; i < mediaArray.length; i++) {
