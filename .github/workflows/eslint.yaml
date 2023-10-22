@@ -19,7 +19,7 @@ jobs:
           npm ci
       - run: npx eslint server/
   lint-frontend:
-    name: Run ESLint on both directories
+    name: Run ESLint on frontend
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
