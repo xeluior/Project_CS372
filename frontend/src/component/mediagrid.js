@@ -1,6 +1,7 @@
 import React, { Component } from "react"
 import styled from "styled-components"
 import MediaPoster from "./mediaposter"
+import PropTypes from "prop-types";
 
 const GridContainer = styled.div`
   display: grid;
@@ -24,5 +25,13 @@ class MediaGrid extends Component {
     )
   }
 }
+
+MediaGrid.propTypes = {
+  mediaData: PropTypes.arrayOf(PropTypes.shape({
+    title: PropTypes.string,
+    url: PropTypes.string,
+    posterUrl: PropTypes.string,
+  })).isRequired, // Validate mediaData as an array of objects with specific shape
+};
 
 export default MediaGrid
