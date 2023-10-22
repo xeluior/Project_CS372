@@ -51,6 +51,7 @@ exports.check_token = (req, res, next) => {
 // middleware for creating a user
 exports.create_user = (req, res) => {
     // hash the password
+    console.log(req.body)
     bcrypt.hash(req.body.password, salt_rounds).then((hashed_pwd) => {
         // insert to mongo
         return users.insertOne({
