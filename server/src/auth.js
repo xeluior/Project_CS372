@@ -1,6 +1,5 @@
 // import modules
 const bcrypt = require('bcrypt')
-const crypto = require('crypto')
 const mongodb = require('mongodb')
 
 // configure the environment
@@ -8,14 +7,12 @@ require('dotenv').config()
 
 // application constants
 const salt_rounds = 10
-const session_id_bits = 128
 const db = new mongodb.MongoClient(process.env.MONGO_URI).db(process.env.DB)
 const users = db.collection('users')
-const sessions = db.collection('sessions')
 
 // middleware for checking the user's password
 // requires that the router or app use a body parser
-exports.check_password = (req, res, next) => {
+exports.check_password = (req, res) => {
     // get the user's hashed password
     users.findOne({ email: req.body.email }).then((user) => {
         // determine if password and hash match
