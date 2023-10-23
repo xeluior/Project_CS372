@@ -1,6 +1,5 @@
 import React, { useState } from "react"
 import { Container, LoginForm, Input, Button, RegisterLink, Title } from "../styles/FormStyle"
-import { isValidEmail } from "../lib/help_lib_functions"
 
 export default function Login() {
     const [email, setEmail] = useState("")
