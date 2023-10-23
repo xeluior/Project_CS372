@@ -2,8 +2,8 @@
 const express = require("express");
 const mongodb = require("mongodb");
 const session = require('express-session')
-const auth = require('./auth.router.js');
-const cors = require('cors');
+const auth = require('./auth.router.js')
+const meta = require('./meta.router.js')
 const path = require('path')
 
 // environment configuration from .env file
@@ -33,8 +33,8 @@ app.use(session({
     saveUninitialized: false,
     resave: false
 }))
-app.use(cors());
 app.use('/auth', auth.router)
+app.use('/meta', meta.router)
 
 // recommendation route
 // takes the "ns" and "id" query parameters to uniquely identify the media to get
