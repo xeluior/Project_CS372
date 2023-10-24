@@ -24,7 +24,7 @@ export default function Register() {
         <Container>
             <LoginForm action="/auth/create" method="POST">
                 <Title>Register</Title>
-                {["Username", "email", "Confirm Email", "password", "Confirm Password"].map((field, idx) => (
+                {["username", "email", "confirm email", "password", "confirm password"].map((field, idx) => (
                     <Input
                         key={idx}
                         type={field.includes("password") ? "password" : "text"}
