@@ -11,6 +11,9 @@ const SideDiv = styled.div`
   float: left;
   border-style: solid;
 `
+const CheckboxLabel = styled.label`
+  color: white;
+`
 
 class CheckboxList extends Component {
   constructor(props) {
@@ -50,14 +53,14 @@ class CheckboxList extends Component {
         <Container>
           {items.map((item) => (
             <div key={item.id}>
-              <label>
+              <CheckboxLabel>
                 <input
                   type="checkbox"
                   checked={checkedItems.has(item.id)}
                   onChange={() => this.handleCheckboxChange(item.id)}
                 />
                 {item.label}
-              </label>
+              </CheckboxLabel>
             </div>
           ))}
         </Container>
