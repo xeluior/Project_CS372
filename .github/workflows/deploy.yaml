@@ -48,6 +48,7 @@ jobs:
           secrets: |
             MONGO_URI=projects/544974938261/secrets/MONGO_URI
             SESSION_SECRET=projects/544974938261/secrets/SESSION_SECRET
+            TMDB_API_KEY=projects/544974938261/secrets/TMDB_API_KEY
           env_vars: |
             DB=media-db
             MEDIA_COLLECTION=pages
