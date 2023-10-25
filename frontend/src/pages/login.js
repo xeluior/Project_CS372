@@ -6,7 +6,7 @@ export default function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
-    const handleSubmit = (e) => {
+    const handleSubmit = () => {
 
         if(!isValidEmail(email)){
             alert("Please enter a valid email!");
