@@ -1,4 +1,5 @@
 import React from "react"
+import PropTypes from "prop-types";
 
 class TextInput extends React.Component {
   state = {
@@ -37,5 +38,10 @@ class TextInput extends React.Component {
     )
   }
 }
+
+TextInput.propTypes = {
+  placeHolderText: PropTypes.string,
+  parentCallback: PropTypes.func, // Define the prop type for parentCallback
+};
 
 export default TextInput

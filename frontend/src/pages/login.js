@@ -38,7 +38,7 @@ export default function Login() {
                     name = "password"
                 />
                 <Button type="submit">Login</Button>
-                <RegisterLink to="/register">Don't have an account? Register here!</RegisterLink>
+                    <RegisterLink to="/register">Don&apos;t have an account? Register here!</RegisterLink>
             </LoginForm>
         </Container>
     );
