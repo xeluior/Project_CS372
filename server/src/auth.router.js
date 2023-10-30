@@ -6,8 +6,8 @@ const auth = require('./auth.js')
 // application constants
 const router = express.Router();
 
-// parse all POST requests as JSON
-router.use(body_parser.json());
+// parse all POST requests as urlencoded
+router.use(body_parser.urlencoded());
 
 // login endpoint returns a session id after a successful password check
 router.post("/login", auth.check_password);

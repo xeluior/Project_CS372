@@ -2,13 +2,17 @@
 import React from "react"
 import MediaGrid from "../component/mediagrid"
 import SearchBar from "../component/searchbar"
-import FilterBox from "../component/filterbox"
 import styled from "styled-components"
+import CheckboxList from "../component/checkboxlist"
 
 const WrapDiv = styled.div`
   display: flex;
   flex-direction: column;
   gap: 20px;
+`
+
+const WhiteText = styled.p`
+  color: white;
 `
 // All media related namespaces on the tvtropes site.
 let mediaNamespaces = [
@@ -58,14 +62,14 @@ class Filter extends React.Component {
     super(props)
     this.state = {
       queryText: "",
-      queryResult: null,
       mediaData: null,
+      nonTropeData: null,
       checkboxData: null,
-      filterData: [],
+      filterData: [], //Data returned from checkboxlist.js callback (All currently unchecked boxes)
       namespaceData: null,
     }
 
-    this.passDataToFilter = this.passDataToFilter.bind(this)
+    this.getUncheckedFilters = this.getUncheckedFilters.bind(this)
   }
 
   async componentDidMount() {
@@ -76,7 +80,7 @@ class Filter extends React.Component {
     await this.fetchDataFromDatabase()
   }
 
-  // Takes in the jsonified database query results and returns a list of the media namespaces in the results (Not tropes)
+  // Takes in the jsonified database query results and returns a list of the media namespaces in the results (Not tropes) for creating checkboxes
   getFilterOptions(data) {
     let resultList = []
 
@@ -91,15 +95,11 @@ class Filter extends React.Component {
     }
 
     let jsonResult = [{}]
-
-    for (
-      let i = 0;
-      i < resultList.length;
-      i++ // Formatting the result as a mappable object
-    ) {
+    // Formatting the result as a mappable object
+    for (let i = 0; i < resultList.length; i++) {
       jsonResult[i] = {
         id: i,
-        text: resultList[i],
+        label: resultList[i],
       }
     }
 
@@ -109,61 +109,63 @@ class Filter extends React.Component {
   async fetchDataFromDatabase() {
     let qText = window.sessionStorage.getItem("query")
 
-    const apiUrl = `${process.env.REACT_APP_API_URL}search?title=${qText}`
+    let apiUrl
+    // If statement allows the app to function in testing and prod by checking for the .env var REACT_APP_API_URL, which is only present on the testing side
+    if (process.env.REACT_APP_API_URL === undefined) {
+      const currentUrl = window.location.href // Get the current URL
+      const endIndex = currentUrl.lastIndexOf(".app") // Find the last occurrence of ".app"
+      const modifiedUrl = (endIndex >= 0 ? currentUrl.slice(0, endIndex + 4) : currentUrl) // If not found, leave URL untouched. 
+
+      apiUrl = `${modifiedUrl}/search?title=${qText}`
+    } else {
+      apiUrl = `${process.env.REACT_APP_API_URL}search?title=${qText}`
+    }
+
     try {
       const response = await fetch(apiUrl)
       const data = await response.json()
-      this.setState({ queryResult: data })
       this.setState({ mediaData: data }) // Set the retrieved data in state
       this.setState({ checkboxData: this.getFilterOptions(data) }) // Set filter options in state
+      this.setState({ nonTropeData: this.filterOutTropes(data) })
     } catch (error) {
       console.error("Error fetching data from the database: ", error)
     }
   }
 
+  //Removes all query results that are not in media namespaces
+  filterOutTropes(allMediaArray) {
+    let result = []
+
+    for (let i = 0; i < allMediaArray.length; i++) {
+      if (mediaNamespaces.includes(allMediaArray[i]["ns"])) {
+        result.push(allMediaArray[i])
+      }
+    }
+
+    return result
+  }
+
   // Returns a json object array of all elements that do not contain any of the namespaces in filterList
   filterMediaNamespaces(mediaArray, filterList) {
-    let allowedNamespaces = []
-
-    for (let i = 0; i < this.state.checkboxData.length; i++) {
-      allowedNamespaces.push({
-        ns: this.state.checkboxData[i]["text"],
-        state: true,
-      }) //Get list of all filter options in format {'ns': music, 'state': true}
-    }
-
-    //Cross reference allowedNamespaces with filterList
-    for (let i = 0; i < filterList.length; i++) {
-      if (filterList[i]["state"] === false) {
-        allowedNamespaces.splice([filterList[i]["id"]], 1) //remove element if its state in the filter list is false
-      }
-    }
-
-    //Cross reference allNameSpaces with mediadata to filter out unwanted data
     let resultArray = []
-    for (let i = 0; i < mediaArray.length; i++) 
-    {
-      let indexFlag = false
-      for (let k = 0; k < allowedNamespaces.length; k++) 
-      {
-        console.log(mediaArray[i]['title'], ", ", mediaArray[i]['ns'], " === ", allowedNamespaces[k]['ns'], "  =  ", mediaArray[i]["ns"] === allowedNamespaces[k]["ns"])
-        console.log(allowedNamespaces)
-        if (mediaArray[i]["ns"] === allowedNamespaces[k]["ns"]) 
-        {
-          indexFlag = true
+
+    for (let i = 0; i < mediaArray.length; i++) {
+      let validFlag = true
+      for (let k = 0; k < filterList.length; k++) {
+        if (mediaArray[i]["ns"] === filterList[k]["label"]) {
+          validFlag = false
         }
       }
-      if (indexFlag) 
-      {
+      if (validFlag) {
         resultArray.push(mediaArray[i])
       }
     }
+
     return resultArray
   }
 
-  // Callback method that goes from filter.js -> filterbox.js -> checkboxlist.js -> checkbox.js to return checkboxes' data
-  passDataToFilter(data) {
-    this.setState({ filterData: data })
+  getUncheckedFilters(uncheckedItems) {
+    this.setState({ filterData: uncheckedItems }) // [{id: 4, label: 'Ride'}, {id: 5, label: 'Music'}]
   }
 
   // Called whenever filterdata's state has changed
@@ -171,7 +173,7 @@ class Filter extends React.Component {
     try {
       if (prevState.filterData !== this.state.filterData) {
         const result = this.filterMediaNamespaces(
-          this.state.queryResult,
+          this.state.nonTropeData,
           this.state.filterData
         )
 
@@ -196,18 +198,17 @@ class Filter extends React.Component {
         <WrapDiv>
           <div>
             {mediaData ? (
-              <FilterBox
-                passDataToFilter={this.passDataToFilter}
-                leftContent={checkboxData}
+              <CheckboxList
+                items={checkboxData}
+                onUncheckedItems={this.getUncheckedFilters}
               />
             ) : (
-              <p>Loading filters...</p>
+              <WhiteText>Loading filters...</WhiteText>
             )}
-
             {mediaData ? (
               <MediaGrid mediaData={mediaData} />
             ) : (
-              <p>Loading results...</p>
+              <WhiteText>Loading results...</WhiteText>
             )}
           </div>
         </WrapDiv>
