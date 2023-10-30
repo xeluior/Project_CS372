@@ -14,10 +14,13 @@
     "plugins": [
         "react"
     ],
+    "ignorePatterns": ["build/"],
     "rules": {
       "no-unused-vars": ["error", {"varsIgnorePattern": "^_"}],
       "react/no-unknown-property": "off",
       "react/prop-types": "off",
       "no-control-regex": "off"
-    }
+    },
+
+    "globals": {"process": "readonly"}
 }
