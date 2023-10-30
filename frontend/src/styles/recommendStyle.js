@@ -5,9 +5,10 @@ export const MoviePageContainer = styled.div`
     flex-direction: column;
     align-items: center;
     padding: 20px;
-    max-width: 1200px; /* Adjust the maximum width as needed */
-    margin: 0 auto; /* Center the container horizontally */
+    max-width: 1200px;
+    margin: 0 auto;
     min-height: 100vh;
+    box-sizing: border-box;  // ensures padding doesn't add to the total height
 `;
 
 export const MoviePoster = styled.div`
@@ -59,3 +60,25 @@ export const BackButton = styled.button`
         box-shadow: 0 0 0 2px #a0a0a0;
     }
 `;
+
+export const MovieDirector = styled.div`
+    margin-top: 10px;
+    color: white;
+    font-weight: bold;
+`;
+
+export const MovieCast = styled.div`
+    margin-top: 10px;
+    color: white;
+`;
+
+export const MovieBudget = styled.div`
+    margin-top: 10px;
+    color: white;
+`;
+
+export const MovieRevenue = styled.div`
+    margin-top: 10px;
+    color: ${props => (props.isProfit ? "#00c853" : "#ff3d00")}; // Green if profit, Red otherwise
+`;
+

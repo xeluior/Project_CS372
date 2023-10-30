@@ -1,6 +1,5 @@
-import React, { useState } from "react";
-import { Container, LoginForm, Input, Button, RegisterLink, Title } from "../styles/FormStyle";
-import { isValidEmail } from "../lib/help_lib_functions";
+import React, { useState } from "react"
+import { Container, LoginForm, Input, Button, RegisterLink, Title } from "../styles/FormStyle"
 
 export default function Login() {
     const [email, setEmail] = useState("");
@@ -8,11 +7,6 @@ export default function Login() {
 
     const handleSubmit = () => {
 
-        if(!isValidEmail(email)){
-            alert("Please enter a valid email!");
-            return;
-        }
-        
         if(password === ""){
             alert("Please enter a password!");
             return;
