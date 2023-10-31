@@ -221,14 +221,10 @@ class Filter extends React.Component {
     let resultArray = []
     let validFlag = true
 
-    console.log("TROPESTOFILTER FORMAT: ", tropesToFilter)
-
     let tropeLabels = []
     for (let i = 0; i < tropesToFilter.length; i++) {
       tropeLabels.push(tropesToFilter[i]["label"])
     }
-
-    console.log("TROPE LABELS: ", tropeLabels)
 
     for (let i = 0; i < mediaList.length; i++) {
       for (let k = 0; k < mediaList[i]["links"].length; k++) {
