@@ -133,7 +133,7 @@ class Filter extends React.Component {
       this.setState({ mediaData: data }) // Set the retrieved data in state
       this.setState({ mediaCheckboxData: this.getFilterOptions(data) }) // Set filter options in state
       this.setState({ nonTropeData: this.filterOutTropes(data) })
-      this.setState({ tropeCheckboxData: this.convertToCheckboxData(this.getTropesFromMedia(data).sort())})
+      this.setState({ tropeCheckboxData: this.convertToCheckboxData(this.getTropesFromMedia(this.state.nonTropeData).sort())})
     } catch (error) {
       console.error("Error fetching data from the database: ", error)
     }
