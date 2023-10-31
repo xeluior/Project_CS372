@@ -64,7 +64,7 @@ class Filter extends React.Component {
       queryText: "",
       mediaData: null,
       nonTropeData: null,
-      checkboxData: null,
+      checkboxData: null, // Media namespace filters
       filterData: [], //Data returned from checkboxlist.js callback (All currently unchecked boxes)
       namespaceData: null,
     }
@@ -114,7 +114,8 @@ class Filter extends React.Component {
     if (process.env.REACT_APP_API_URL === undefined) {
       const currentUrl = window.location.href // Get the current URL
       const endIndex = currentUrl.lastIndexOf(".app") // Find the last occurrence of ".app"
-      const modifiedUrl = (endIndex >= 0 ? currentUrl.slice(0, endIndex + 4) : currentUrl) // If not found, leave URL untouched. 
+      const modifiedUrl =
+        endIndex >= 0 ? currentUrl.slice(0, endIndex + 4) : currentUrl // If not found, leave URL untouched.
 
       apiUrl = `${modifiedUrl}/search?title=${qText}`
     } else {
@@ -168,6 +169,25 @@ class Filter extends React.Component {
     this.setState({ filterData: uncheckedItems }) // [{id: 4, label: 'Ride'}, {id: 5, label: 'Music'}]
   }
 
+  getTropesFromMedia(mediaList) {
+    let tropesList = []
+    console.log("PRE FUNCTION: ", mediaList)
+    for (let i = 0; i < mediaList.length; i++) {
+      for (let k = 0; k < mediaList[i]["links"].length; k++) {
+        if (mediaList[i]["links"][k]["ns"] === "Main") {
+          // If the trope is in main, i.e. is a trope
+          if (!tropesList.includes(mediaList[i]["links"][k]["id"])) {
+            // If the trope is not already in the list
+            tropesList.push(mediaList[i]["links"][k]["id"])
+          }
+        }
+      }
+    }
+
+    console.log("TROPES: ", tropesList)
+    return tropesList
+  }
+
   // Called whenever filterdata's state has changed
   componentDidUpdate(prevProps, prevState) {
     try {
@@ -178,8 +198,10 @@ class Filter extends React.Component {
         )
 
         if (result) {
-          this.setState({ mediaData: null })
+          this.setState({ mediaData: null }) // Potentially redundant
           this.setState({ mediaData: result })
+
+          this.getTropesFromMedia(result)
         }
       }
     } catch (error) {
