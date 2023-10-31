@@ -6,8 +6,12 @@ import PropTypes from "prop-types";
 const GridContainer = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  grid-auto-rows: 400px; /* Set a fixed height for each row, change this value as needed */
   gap: 20px;
-`
+  flex: 1;
+  overflow: auto;
+`;
+
 let key = 0
 
 class MediaGrid extends Component {

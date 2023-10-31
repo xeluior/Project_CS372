@@ -7,7 +7,7 @@ const Container = styled.div`
   gap: 5px;
 `
 const SideDiv = styled.div`
-  width: 20%; // maybe a value instead
+  width: 275px; // maybe a value instead
   float: left;
   border-style: solid;
 `
