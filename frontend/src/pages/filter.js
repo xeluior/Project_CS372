@@ -253,9 +253,7 @@ class Filter extends React.Component {
           this.state.nonTropeData,
           this.state.mediaFilterData
         )
-          console.log("PRE: ", result)
-          result = this.filterMediaTropes(result, this.state.tropeFilterData)
-          console.log("POST: ", result)
+          result = this.filterMediaTropes(result, this.state.tropeFilterData) // Removing filtered tropes
         if (result) {
           this.setState({ mediaData: null }) // Potentially redundant
           this.setState({ mediaData: result })
