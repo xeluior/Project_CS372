@@ -7,10 +7,18 @@ const Container = styled.div`
   gap: 5px;
 `
 const SideDiv = styled.div`
-  width: 20%; //mayeb val instead
+  width: 20%; // maybe a value instead
   float: left;
   border-style: solid;
 `
+
+const SearchBar = styled.input`
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px;
+  margin-bottom: 10px;
+`
+
 const CheckboxLabel = styled.label`
   color: white;
 `
@@ -21,6 +29,7 @@ class CheckboxList extends Component {
     this.state = {
       items: props.items,
       checkedItems: new Set(props.items.map((item) => item.id)),
+      searchTerm: "", // State to hold the search term
     }
   }
 
@@ -35,6 +44,17 @@ class CheckboxList extends Component {
     this.handleUncheckedItemsCallback()
   }
 
+  handleSearch = (event) => {
+    this.setState({ searchTerm: event.target.value.toLowerCase() }) // Update the search term
+  }
+
+  getFilteredItems = () => {
+    const { items, searchTerm } = this.state
+    return items.filter(
+      (item) => item.label.toLowerCase().includes(searchTerm) // Filter based on the search term
+    )
+  }
+
   getUncheckedItems = () => {
     const { items, checkedItems } = this.state
     return items.filter((item) => !checkedItems.has(item.id))
@@ -46,12 +66,18 @@ class CheckboxList extends Component {
   }
 
   render() {
-    const { items, checkedItems } = this.state
+    const { checkedItems } = this.state
+    const filteredItems = this.getFilteredItems()
 
     return (
       <SideDiv>
+        <SearchBar
+          type="text"
+          placeholder="Search..."
+          onChange={this.handleSearch}
+        />
         <Container>
-          {items.map((item) => (
+          {filteredItems.map((item) => (
             <div key={item.id}>
               <CheckboxLabel>
                 <input
