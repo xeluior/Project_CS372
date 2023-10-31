@@ -64,18 +64,23 @@ class Filter extends React.Component {
       queryText: "",
       mediaData: null,
       nonTropeData: null,
-      checkboxData: null, // Media namespace filters
-      filterData: [], //Data returned from checkboxlist.js callback (All currently unchecked boxes)
+      mediaCheckboxData: null, // Media namespace filters
+      tropeCheckboxData: null, // Trope filters
+      mediaFilterData: [], //Data returned from checkboxlist.js callback (All currently unchecked boxes)
+      tropeFilterData: [],
       namespaceData: null,
     }
 
-    this.getUncheckedFilters = this.getUncheckedFilters.bind(this)
+    this.getUncheckedTropeFilters = this.getUncheckedTropeFilters.bind(this)
+    this.getUncheckedMediaFilters = this.getUncheckedMediaFilters.bind(this)
   }
 
   async componentDidMount() {
     // Fetch data from the database when the component mounts and reset filter data
-    this.setState({ filterData: [] })
-    this.setState({ checkboxData: null })
+    this.setState({ mediaFilterData: [] })
+    this.setState({ tropeFilterData: [] })
+    this.setState({ mediaCheckboxData: null })
+    this.setState({ tropeCheckboxData: null })
 
     await this.fetchDataFromDatabase()
   }
@@ -126,8 +131,9 @@ class Filter extends React.Component {
       const response = await fetch(apiUrl)
       const data = await response.json()
       this.setState({ mediaData: data }) // Set the retrieved data in state
-      this.setState({ checkboxData: this.getFilterOptions(data) }) // Set filter options in state
+      this.setState({ mediaCheckboxData: this.getFilterOptions(data) }) // Set filter options in state
       this.setState({ nonTropeData: this.filterOutTropes(data) })
+      this.setState({ tropeCheckboxData: this.convertToCheckboxData(this.getTropesFromMedia(data))})
     } catch (error) {
       console.error("Error fetching data from the database: ", error)
     }
@@ -165,13 +171,17 @@ class Filter extends React.Component {
     return resultArray
   }
 
-  getUncheckedFilters(uncheckedItems) {
-    this.setState({ filterData: uncheckedItems }) // [{id: 4, label: 'Ride'}, {id: 5, label: 'Music'}]
+  getUncheckedMediaFilters(uncheckedItems) {
+    this.setState({ mediaFilterData: uncheckedItems }) // [{id: 4, label: 'Ride'}, {id: 5, label: 'Music'}]
+  }
+
+  getUncheckedTropeFilters(uncheckedItems)
+  {
+    this.setState({ tropeFilterData: uncheckedItems }) // [{id: 4, label: 'Ride'}, {id: 5, label: 'Music'}]
   }
 
   getTropesFromMedia(mediaList) {
     let tropesList = []
-    console.log("PRE FUNCTION: ", mediaList)
     for (let i = 0; i < mediaList.length; i++) {
       for (let k = 0; k < mediaList[i]["links"].length; k++) {
         if (mediaList[i]["links"][k]["ns"] === "Main") {
@@ -184,19 +194,68 @@ class Filter extends React.Component {
       }
     }
 
-    console.log("TROPES: ", tropesList)
     return tropesList
+  }
+
+  // Converts the array of strings that is the tropes list and converts it to a json/mappable format
+  convertToCheckboxData(tropesList)
+  {
+    let jsonResult = [{}]
+    // Formatting the result as a mappable object
+    for (let i = 0; i < tropesList.length; i++) {
+      jsonResult[i] = {
+        id: i,
+        label: tropesList[i],
+      }
+    }
+
+    return jsonResult
+  }
+
+  // Takes a list of media and a list of tropes and returns an array containing only the meida that does not contain any of those tropes
+  filterMediaTropes(mediaList, tropesToFilter)
+  {
+    let resultArray = []
+    let validFlag = true
+
+    console.log("TROPESTOFILTER FORMAT: ", tropesToFilter)
+
+    let tropeLabels = []
+    for(let i = 0; i < tropesToFilter.length; i++)
+    {
+      tropeLabels.push(tropesToFilter[i]["label"])
+    }
+
+    console.log("TROPE LABELS: ", tropeLabels)
+
+    for (let i = 0; i < mediaList.length; i++) {
+      for (let k = 0; k < mediaList[i]["links"].length; k++) {
+        if(tropeLabels.includes(mediaList[i]["links"][k]["id"]))
+        {
+          validFlag = false
+        }
+      }
+      if(validFlag)
+      {
+        resultArray.push(mediaList[i])
+      }
+      validFlag = true
+    }
+
+    return resultArray
   }
 
   // Called whenever filterdata's state has changed
   componentDidUpdate(prevProps, prevState) {
     try {
-      if (prevState.filterData !== this.state.filterData) {
-        const result = this.filterMediaNamespaces(
+      if (prevState.mediaFilterData !== this.state.mediaFilterData || prevState.tropeFilterData !== this.state.tropeFilterData) {
+        let result = this.filterMediaNamespaces(
           this.state.nonTropeData,
-          this.state.filterData
+          this.state.mediaFilterData
         )
-
+          console.log("PRE: ", result)
+          result = this.filterMediaTropes(result, this.state.tropeFilterData)
+          console.log("POST: ", result)
         if (result) {
           this.setState({ mediaData: null }) // Potentially redundant
           this.setState({ mediaData: result })
@@ -210,7 +269,7 @@ class Filter extends React.Component {
   }
 
   render() {
-    const { mediaData, checkboxData } = this.state
+    const { mediaData, mediaCheckboxData, tropeCheckboxData } = this.state
 
     return (
       <div>
@@ -220,10 +279,16 @@ class Filter extends React.Component {
         <WrapDiv>
           <div>
             {mediaData ? (
+              <div> 
               <CheckboxList
-                items={checkboxData}
-                onUncheckedItems={this.getUncheckedFilters}
+                items={mediaCheckboxData}
+                onUncheckedItems={this.getUncheckedMediaFilters}
               />
+              <CheckboxList
+                items={tropeCheckboxData}
+                onUncheckedItems={this.getUncheckedTropeFilters}
+              />
+              </div>
             ) : (
               <WhiteText>Loading filters...</WhiteText>
             )}
