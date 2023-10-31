@@ -136,10 +136,11 @@ class Filter extends React.Component {
     try {
       const response = await fetch(apiUrl)
       const data = await response.json()
-      this.setState({ mediaData: data }) // Set the retrieved data in state
+      this.setState({ mediaData: this.filterOutTropes(data) }) // Set the retrieved data in state
       this.setState({ mediaCheckboxData: this.getFilterOptions(data) }) // Set filter options in state
       this.setState({ nonTropeData: this.filterOutTropes(data) })
       this.setState({ tropeCheckboxData: this.convertToCheckboxData(this.getTropesFromMedia(this.filterOutTropes(data)).sort()) })
+
     } catch (error) {
       console.error("Error fetching data from the database: ", error)
     }
@@ -251,10 +252,7 @@ class Filter extends React.Component {
         )
         result = this.filterMediaTropes(result, this.state.tropeFilterData) // Removing filtered tropes
         if (result) {
-          this.setState({ mediaData: null }) // Potentially redundant
           this.setState({ mediaData: result })
-
-          this.getTropesFromMedia(result)
         }
       }
     } catch (error) {
