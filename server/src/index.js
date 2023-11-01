@@ -2,8 +2,10 @@
 const express = require("express");
 const mongodb = require("mongodb");
 const session = require('express-session')
-const auth = require('./auth.router.js');
-const cors = require('cors');
+const auth = require('./auth.router.js')
+const meta = require('./meta.router.js')
+const cors = require('cors')
+const path = require('path')
 
 // environment configuration from .env file
 require("dotenv").config()
@@ -29,20 +31,20 @@ const media = mongo.db(db_name).collection(pages_collection_name)
 const users = mongo.db(db_name).collection(users_collection_name)
 
 // use additional routes
+app.use(cors())
 app.use(session({
     secret: process.env.SESSION_SECRET,
     saveUninitialized: false,
     resave: false
 }))
-app.use(cors());
-app.use(express.static('../frontend/build'))
 app.use('/auth', auth.router)
+app.use('/meta', meta.router)
 
 // recommendation route
 // takes the "ns" and "id" query parameters to uniquely identify the media to get
 app.get("/recommendation", (req, res) => {
     media.findOne({
-        namespace: req.query.ns,
+        ns: req.query.ns,
         id: req.query.id
     })
     .then((result) => {
@@ -93,6 +95,15 @@ app.post("/watch-later", (req, res) => {
         res.sendStatus(403)
     }
 });
+
+// serve static resources from the server
+const react_dist = path.join(__dirname, '../../frontend/build')
+app.use(express.static(react_dist))
+
+// redirect all unhandled requests to React-Router to handle
+app.get('*', (req, res) => {
+    res.sendFile('index.html', { root: react_dist })
+})
 
 // start the app
 app.listen(port, () => {
