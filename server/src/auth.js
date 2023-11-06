@@ -34,6 +34,13 @@ exports.check_password = (req, res) => {
     })
 }
 
+exports.logout = (req, res) => {
+  req.session.destroy(() => {
+    res.clearCookie("connect.sid")
+    res.redirect(303, '/')
+  })
+}
+
 // middleware for validating an existing session
 exports.check_token = (req, res, next) => {
     users.findOne({ email: req.session.email }).then((user) => {
