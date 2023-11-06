@@ -11,8 +11,9 @@ const path = require('path')
 require("dotenv").config()
 
 // configuration constants
-const db_name = process.env.DB
-const collection_name = process.env.MEDIA_COLLECTION
+const db_name = 'media-db'
+const pages_collection_name = 'pages'
+const user_collection_name = 'users'
 
 // initialize the express app
 const app = express()
@@ -26,7 +27,8 @@ const port = process.env.PORT || 8080
 // defaults or hard codes should never happen since the connection string includes the password
 // this will fail if the environment variable is not present
 const mongo = new mongodb.MongoClient(process.env.MONGO_URI)
-const media = mongo.db(db_name).collection(collection_name)
+const media = mongo.db(db_name).collection(pages_collection_name)
+const users = mongo.db(db_name).collection(users_collection_name)
 
 // use additional routes
 app.use(cors())
@@ -69,6 +71,30 @@ app.get("/search", (req, res) => {
         res.send(result)
     })
 })
+
+//watch later function
+app.post("/watch-later", (req, res) => {
+    /*get user id based on token (session id)
+    add namespace:id of item to json attribute*/
+    //check if user is logged in
+    if (req.session.uid !== null) {
+        users.update(
+            {
+                id: req.session.uid,
+            },
+            { 
+                // make watch-later an array and .add() trope
+                $set: {
+                    watch_later: watch_later.add(req.query.id)
+                }
+            }
+        )
+        res.sendStatus(200)
+    }
+    else {
+        res.sendStatus(403)
+    }
+});
 
 // serve static resources from the server
 const react_dist = path.join(__dirname, '../../frontend/build')
