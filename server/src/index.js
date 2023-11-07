@@ -26,7 +26,7 @@ const port = process.env.PORT || 8080
 // this will fail if the environment variable is not present
 const mongo = new mongodb.MongoClient(process.env.MONGO_URI)
 const media = mongo.db(db_name).collection(pages_collection_name)
-const users = mongo.db(db_name).collection(users_collection_name)
+const users = mongo.db(db_name).collection(user_collection_name)
 
 // use additional routes
 app.use(session({
@@ -56,8 +56,8 @@ app.get("/recommendation", (req, res) => {
 app.get("/search", (req, res) => {
     /* recieve url request
     return json response res.send */
+
     //get query
-    
     media.find({
         /* TODO: filters */
         $text: {
@@ -74,6 +74,7 @@ app.get("/search", (req, res) => {
 app.post("/watch-later", (req, res) => {
     /*get user id based on token (session id)
     add namespace:id of item to json attribute*/
+
     //check if user is logged in
     if (req.session.uid !== null) {
         users.update(
@@ -92,7 +93,9 @@ app.post("/watch-later", (req, res) => {
     else {
         res.sendStatus(403)
     }
-});
+})
+
+
 
 // start the app
 app.listen(port, () => {
