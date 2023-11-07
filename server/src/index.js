@@ -28,6 +28,7 @@ const port = process.env.PORT || 8080
 // this will fail if the environment variable is not present
 const mongo = new mongodb.MongoClient(process.env.MONGO_URI)
 const media = mongo.db(db_name).collection(pages_collection_name)
+
 const users = mongo.db(db_name).collection(user_collection_name)
 
 // use additional routes
@@ -95,9 +96,8 @@ app.post("/watch-later", (req, res) => {
     else {
         res.sendStatus(403)
     }
+
 })
-
-
 
 // serve static resources from the server
 const react_dist = path.join(__dirname, '../../frontend/build')

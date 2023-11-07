@@ -5,15 +5,21 @@ import SearchBar from "../component/searchbar"
 import styled from "styled-components"
 import CheckboxList from "../component/checkboxlist"
 
-const WrapDiv = styled.div`
+const FilterContainer = styled.div`
+  display: flex;
+  gap: 20px;
+`;
+
+const FiltersSection = styled.div`
   display: flex;
   flex-direction: column;
   gap: 20px;
-`
+`;
 
 const WhiteText = styled.p`
   color: white;
-`
+`;
+
 // All media related namespaces on the tvtropes site.
 let mediaNamespaces = [
   "Advertising",
@@ -64,18 +70,23 @@ class Filter extends React.Component {
       queryText: "",
       mediaData: null,
       nonTropeData: null,
-      checkboxData: null,
-      filterData: [], //Data returned from checkboxlist.js callback (All currently unchecked boxes)
+      mediaCheckboxData: null, // Media namespace filters
+      tropeCheckboxData: null, // Trope filters
+      mediaFilterData: [], //Data returned from checkboxlist.js callback (All currently unchecked boxes)
+      tropeFilterData: [],
       namespaceData: null,
     }
 
-    this.getUncheckedFilters = this.getUncheckedFilters.bind(this)
+    this.getUncheckedTropeFilters = this.getUncheckedTropeFilters.bind(this)
+    this.getUncheckedMediaFilters = this.getUncheckedMediaFilters.bind(this)
   }
 
   async componentDidMount() {
     // Fetch data from the database when the component mounts and reset filter data
-    this.setState({ filterData: [] })
-    this.setState({ checkboxData: null })
+    this.setState({ mediaFilterData: [] })
+    this.setState({ tropeFilterData: [] })
+    this.setState({ mediaCheckboxData: null })
+    this.setState({ tropeCheckboxData: null })
 
     await this.fetchDataFromDatabase()
   }
@@ -113,8 +124,9 @@ class Filter extends React.Component {
     // If statement allows the app to function in testing and prod by checking for the .env var REACT_APP_API_URL, which is only present on the testing side
     if (process.env.REACT_APP_API_URL === undefined) {
       const currentUrl = window.location.href // Get the current URL
-      const endIndex = currentUrl.lastIndexOf(".app") // Find the last occurrence of ".app"
-      const modifiedUrl = (endIndex >= 0 ? currentUrl.slice(0, endIndex + 4) : currentUrl) // If not found, leave URL untouched. 
+      const endIndex = currentUrl.lastIndexOf("/") // Find the last occurrence of ".app"
+      const modifiedUrl =
+        endIndex >= 0 ? currentUrl.slice(0, endIndex) : currentUrl // If not found, leave URL untouched.
 
       apiUrl = `${modifiedUrl}/search?title=${qText}`
     } else {
@@ -124,9 +136,11 @@ class Filter extends React.Component {
     try {
       const response = await fetch(apiUrl)
       const data = await response.json()
-      this.setState({ mediaData: data }) // Set the retrieved data in state
-      this.setState({ checkboxData: this.getFilterOptions(data) }) // Set filter options in state
+      this.setState({ mediaData: this.filterOutTropes(data) }) // Set the retrieved data in state
+      this.setState({ mediaCheckboxData: this.getFilterOptions(data) }) // Set filter options in state
       this.setState({ nonTropeData: this.filterOutTropes(data) })
+      this.setState({ tropeCheckboxData: this.convertToCheckboxData(this.getTropesFromMedia(this.filterOutTropes(data)).sort()) })
+
     } catch (error) {
       console.error("Error fetching data from the database: ", error)
     }
@@ -164,21 +178,80 @@ class Filter extends React.Component {
     return resultArray
   }
 
-  getUncheckedFilters(uncheckedItems) {
-    this.setState({ filterData: uncheckedItems }) // [{id: 4, label: 'Ride'}, {id: 5, label: 'Music'}]
+  getUncheckedMediaFilters(uncheckedItems) {
+    this.setState({ mediaFilterData: uncheckedItems }) // [{id: 4, label: 'Ride'}, {id: 5, label: 'Music'}]
+  }
+
+  getUncheckedTropeFilters(uncheckedItems) {
+    this.setState({ tropeFilterData: uncheckedItems }) // [{id: 4, label: 'Ride'}, {id: 5, label: 'Music'}]
+  }
+
+  getTropesFromMedia(mediaList) {
+    let tropesList = []
+    for (let i = 0; i < mediaList.length; i++) {
+      for (let k = 0; k < mediaList[i]["links"].length; k++) {
+        if (mediaList[i]["links"][k]["ns"] === "Main") {
+          // If the trope is in main, i.e. is a trope
+          if (!tropesList.includes(mediaList[i]["links"][k]["id"])) {
+            // If the trope is not already in the list
+            tropesList.push(mediaList[i]["links"][k]["id"])
+          }
+        }
+      }
+    }
+
+    return tropesList
+  }
+
+  // Converts the array of strings that is the tropes list and converts it to a json/mappable format
+  convertToCheckboxData(tropesList) {
+    let jsonResult = [{}]
+    // Formatting the result as a mappable object
+    for (let i = 0; i < tropesList.length; i++) {
+      jsonResult[i] = {
+        id: i,
+        label: tropesList[i],
+      }
+    }
+
+    return jsonResult
+  }
+
+  // Takes a list of media and a list of tropes and returns an array containing only the meida that does not contain any of those tropes
+  filterMediaTropes(mediaList, tropesToFilter) {
+    let resultArray = []
+    let validFlag = true
+
+    let tropeLabels = []
+    for (let i = 0; i < tropesToFilter.length; i++) {
+      tropeLabels.push(tropesToFilter[i]["label"])
+    }
+
+    for (let i = 0; i < mediaList.length; i++) {
+      for (let k = 0; k < mediaList[i]["links"].length; k++) {
+        if (tropeLabels.includes(mediaList[i]["links"][k]["id"])) {
+          validFlag = false
+        }
+      }
+      if (validFlag) {
+        resultArray.push(mediaList[i])
+      }
+      validFlag = true
+    }
+
+    return resultArray
   }
 
   // Called whenever filterdata's state has changed
   componentDidUpdate(prevProps, prevState) {
     try {
-      if (prevState.filterData !== this.state.filterData) {
-        const result = this.filterMediaNamespaces(
+      if (prevState.mediaFilterData !== this.state.mediaFilterData || prevState.tropeFilterData !== this.state.tropeFilterData) {
+        let result = this.filterMediaNamespaces(
           this.state.nonTropeData,
-          this.state.filterData
+          this.state.mediaFilterData
         )
-
+        result = this.filterMediaTropes(result, this.state.tropeFilterData) // Removing filtered tropes
         if (result) {
-          this.setState({ mediaData: null })
           this.setState({ mediaData: result })
         }
       }
@@ -187,34 +260,47 @@ class Filter extends React.Component {
     }
   }
 
+
   render() {
-    const { mediaData, checkboxData } = this.state
+    const { mediaData, mediaCheckboxData, tropeCheckboxData } = this.state;
 
     return (
       <div>
         <div className="search">
           <SearchBar />
         </div>
-        <WrapDiv>
-          <div>
-            {mediaData ? (
-              <CheckboxList
-                items={checkboxData}
-                onUncheckedItems={this.getUncheckedFilters}
-              />
-            ) : (
-              <WhiteText>Loading filters...</WhiteText>
-            )}
-            {mediaData ? (
-              <MediaGrid mediaData={mediaData} />
-            ) : (
-              <WhiteText>Loading results...</WhiteText>
-            )}
-          </div>
-        </WrapDiv>
+        <FilterContainer>
+          <FiltersSection>
+            <div>
+              {mediaData ? (
+                <CheckboxList
+                  items={mediaCheckboxData}
+                  onUncheckedItems={this.getUncheckedMediaFilters}
+                />
+              ) : (
+                <WhiteText>Loading filters...</WhiteText>
+              )}
+            </div>
+            <div>
+              {mediaData ? (
+                <CheckboxList
+                  items={tropeCheckboxData}
+                  onUncheckedItems={this.getUncheckedTropeFilters}
+                />
+              ) : (
+                <WhiteText>Loading filters...</WhiteText>
+              )}
+            </div>
+          </FiltersSection>
+          {mediaData ? (
+            <MediaGrid mediaData={mediaData} />
+          ) : (
+            <WhiteText>Loading results...</WhiteText>
+          )}
+        </FilterContainer>
       </div>
-    )
+    );
   }
 }
 
-export default Filter
+export default Filter;
