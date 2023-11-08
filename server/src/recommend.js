@@ -10,25 +10,42 @@ const cache_days = 1
 
 // fills the database with the calculated recommendations iff it has none or they are outdated
 // the algorithm for calculating score is O(n^2) so we need to cache the result for a time
-async function check_cache(req, _, next) {
+async function check_cache(req, res, next) {
   // helper function since there no "day add" feature
   function get_ttl() {
-    let tomorrow = Date.now()
+    let tomorrow = new Date()
     tomorrow.setDate(tomorrow.getDate() + cache_days)
     return tomorrow
   }
 
   // get some basic page information
   const page = await pages.findOne({ ns: req.query.ns, id: req.query.id })
+  if (page === null) {
+    res.sendStatus(404)
+    return;
+  }
+
   const has_recs = page.recommendations !== undefined
-  const ttl_outdated = page.rec_cache_ttl < Date.now() ? page.rec_cache_ttl !== undefined : true
+  const ttl_outdated = (() => {
+    if (page.rec_cache_ttl) {
+      return page.rec_cache_ttl < new Date()
+    } else {
+      return true
+    }
+  })()
 
   if (!has_recs || ttl_outdated) {
     // regenerate scores but not likes
     // reset scores if they already exist
-    const recs = page.recommendations.map((item) => {
-      item.score = 0
-    }) ? has_recs : []
+    const recs = (() => {
+      if (has_recs) {
+        return page.recommendations.map((item) => {
+          item.score = 0
+        })
+      } else {
+        return []
+      }
+    })()
 
     // the following block generates scores by getting all pages the current page links to
     // getting the pages *those* pages link to, and counting how many times the second set
@@ -37,7 +54,7 @@ async function check_cache(req, _, next) {
     for (const link of page.links) {
       const result = await pages.findOne({ ns: link.ns, id: link.id })
       if (!result) {
-        console.err(`Attempted to access nonexistent page ${link.ns}/${link.id}`)
+        console.error(`Attempted to access nonexistent page ${link.ns}/${link.id}`)
         continue
       }
 
@@ -59,7 +76,7 @@ async function check_cache(req, _, next) {
 
     // since we get the recommendations earlier, we just clobber whatever is in the database
     // this may lose some likes which have been added while the algorithm is running
-    pages.updateOne({_id: page._id}, { $set: {
+    await pages.updateOne({_id: page._id}, { $set: {
       rec_cache_ttl: get_ttl(),
       recommendations: recs
     }})
@@ -75,7 +92,9 @@ async function get_recommendations(req, res) {
   const recommendations = page.recommendations || []
   
   res.send(recommendations.map((item) => {
-    item.score += item.likes.lenght
+    if (item.likes) {
+      item.scores += item.likes.length
+    }
     item.likes = undefined
     return item
   }))
