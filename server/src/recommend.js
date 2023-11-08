@@ -20,7 +20,7 @@ async function check_cache(req, res, next) {
 
   // get some basic page information
   const page = await pages.findOne({ ns: req.query.ns, id: req.query.id })
-  if (page === null) {
+  if (!page) {
     res.sendStatus(404)
     return;
   }
@@ -93,7 +93,7 @@ async function get_recommendations(req, res) {
   
   res.send(recommendations.map((item) => {
     if (item.likes) {
-      item.scores += item.likes.length
+      item.score += item.likes.length
     }
     item.likes = undefined
     return item
