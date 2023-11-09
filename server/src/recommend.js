@@ -60,6 +60,7 @@ async function check_cache(req, res, next) {
 
       for (const recommendation of result.links) {
         const rec = recs.findIndex((item) => {
+          if (!item) return false
           return item.ns === recommendation.ns && item.id === recommendation.id
         })
         if (rec !== -1) {
@@ -92,6 +93,7 @@ async function get_recommendations(req, res) {
   const recommendations = page.recommendations || []
   
   res.send(recommendations.map((item) => {
+    if (!item) return undefined
     if (item.likes) {
       item.score += item.likes.length
     }

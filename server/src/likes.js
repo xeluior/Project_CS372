@@ -5,32 +5,45 @@ const mongodb = new MongoClient(process.env.MONGO_URI)
 const db = mongodb.db(process.env.DB)
 const pages = db.collection('pages');
 
-async function add_like(req, res) {
+// middleware to store mongoDB objects along with the request
+async function get_page(req, res, next) {
   const page = await pages.findOne({ns: req.query.ns, id: req.query.id})
   if (!page) {
     res.sendStatus(404)
     return
   }
 
-  const user = req.session.uid
-  if (!user) {
-    res.sendStatus(403)
-    return
+  req.page = page
+  next()
+}
+
+// for a given MongoDB Page object, finds the recommendation object specified
+async function find_rec(page, rns, rid) {
+  if (!page.recommendations) {
+    return undefined
   }
 
-  const recommendation = page.recommendations.findIndex((item) => {
-    return item.ns === req.query.rns && item.id === req.query.rid
+  return page.recommendations.find((item) => {
+    if (!item) return false
+    return item.ns === rns && item.id === rid
   })
+}
 
-  const likes = page.recommendations[recommendation].likes || []
-  if (likes.includes(user)) {
+// adds the currently signed in user's like to the recommendation on page `req.page` for the media
+// identified by req.query.rns and req.query.rid
+// Always use the get_page middleware before this
+async function add_like(req, res) {
+  const recommendation = find_rec(req.page, req.query.rns, req.query.rid)
+
+  const likes = recommendation.likes || []
+  if (likes.includes(req.session.uid)) {
     res.sendStatus(400)
     return
   }
 
-  likes.push(user)
+  likes.push(req.session.uid)
   await pages.updateOne(
-    {_id: page._id},
+    {_id: req.page._id},
     {$set: {
       "recommendations.$[x].likes": likes
     }},
@@ -46,4 +59,23 @@ async function add_like(req, res) {
   res.sendStatus(201)
 }
 
-module.exports = { add_like }
+// removes the currently signed in user's like to the recommendation on page `req.page` for the media
+// identified by req.query.rns and req.query.rid
+// Always use the get_page middleware before this
+async function remove_like(req, res) {
+  await pages.updateOne(
+    {_id: req.page._id},
+    { $pull: { "recommendations.$[x].likes": req.session.uid } },
+    {
+      arrayFilters: [{
+        $and: [
+          {"x.ns": {$eq: req.query.rns}},
+          {"x.id": {$eq: req.query.rid}}
+        ]
+      }]
+    }
+  )
+  res.sendStatus(204)
+}
+
+module.exports = { remove_like, add_like, get_page }
