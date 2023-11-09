@@ -3,7 +3,50 @@ require('dotenv').config()
 
 const mongodb = new MongoClient(process.env.MONGO_URI)
 const db = mongodb.db(process.env.DB)
-const pages = db.collection('pages');
+const pages = db.collection('pages')
+
+// yoinked from Henry's serverside code
+let media_namespaces = [
+  "Advertising",
+  "Animation",
+  "Anime",
+  "ARG",
+  "Art",
+  "AudoPlay",
+  "Blog",
+  "ComicBook",
+  "ComicStrip",
+  "Creator",
+  "Fanfic",
+  "Film",
+  "Franchise",
+  "Literature",
+  "Magazine",
+  "Manga",
+  "Manhua",
+  "Manhwa",
+  "Music",
+  "Myth",
+  "Pinball",
+  "Podcast",
+  "Radio",
+  "Ride",
+  "Roleplay",
+  "Script",
+  "Series",
+  "TabletopGame",
+  "Theatre",
+  "Toys",
+  "VideoGame",
+  "VisualNovel",
+  "WebAnimation",
+  "WebComic",
+  "Website",
+  "WebOriginal",
+  "WebVideo",
+  "WesternAnimation",
+  "Wrestling",
+]
 
 // define how long to keep recommendations for before regenerating the scores
 const cache_days = 1
@@ -59,6 +102,8 @@ async function check_cache(req, res, next) {
       }
 
       for (const recommendation of result.links) {
+        if (!media_namespaces.includes(recommendation.ns)) continue
+
         const rec = recs.findIndex((item) => {
           if (!item) return false
           return item.ns === recommendation.ns && item.id === recommendation.id
