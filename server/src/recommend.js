@@ -96,8 +96,8 @@ async function get_recommendations(req, res) {
     if (!item) return undefined
     if (item.likes) {
       item.score += item.likes.length
+      item.likes = undefined
     }
-    item.likes = undefined
     return item
   }))
 }

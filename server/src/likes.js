@@ -17,35 +17,14 @@ async function get_page(req, res, next) {
   next()
 }
 
-// for a given MongoDB Page object, finds the recommendation object specified
-async function find_rec(page, rns, rid) {
-  if (!page.recommendations) {
-    return undefined
-  }
-
-  return page.recommendations.find((item) => {
-    if (!item) return false
-    return item.ns === rns && item.id === rid
-  })
-}
-
 // adds the currently signed in user's like to the recommendation on page `req.page` for the media
 // identified by req.query.rns and req.query.rid
 // Always use the get_page middleware before this
 async function add_like(req, res) {
-  const recommendation = find_rec(req.page, req.query.rns, req.query.rid)
-
-  const likes = recommendation.likes || []
-  if (likes.includes(req.session.uid)) {
-    res.sendStatus(400)
-    return
-  }
-
-  likes.push(req.session.uid)
   await pages.updateOne(
     {_id: req.page._id},
-    {$set: {
-      "recommendations.$[x].likes": likes
+    {$push: {
+      "recommendations.$[x].likes": req.session.uid
     }},
     {
       arrayFilters: [{
