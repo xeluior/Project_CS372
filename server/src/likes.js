@@ -23,9 +23,7 @@ async function get_page(req, res, next) {
 async function add_like(req, res) {
   await pages.updateOne(
     {_id: req.page._id},
-    {$push: {
-      "recommendations.$[x].likes": req.session.uid
-    }},
+    { $push: { "recommendations.$[x].likes": req.session.uid } },
     {
       arrayFilters: [{
         $and: [
@@ -57,4 +55,13 @@ async function remove_like(req, res) {
   res.sendStatus(204)
 }
 
-module.exports = { remove_like, add_like, get_page }
+// gets which recommendations on a page the user has liked
+async function get_likes(req, res) {
+  const recommendations = req.page.recommendations
+  const user_likes = recommendations.filter(item => item && item.likes && item.likes.includes(req.session.uid))
+  res.send(user_likes.map((item) => {
+    return {ns: item.ns, id: item.id}
+  }))
+}
+
+module.exports = { remove_like, add_like, get_page, get_likes }
