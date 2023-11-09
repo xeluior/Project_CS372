@@ -72,23 +72,18 @@ async function check_cache(req, res, next) {
   const ttl_outdated = (() => {
     if (page.rec_cache_ttl) {
       return page.rec_cache_ttl < new Date()
-    } else {
-      return true
     }
+    return true
   })()
 
   if (!has_recs || ttl_outdated) {
     // regenerate scores but not likes
     // reset scores if they already exist
-    const recs = (() => {
-      if (has_recs) {
-        return page.recommendations.map((item) => {
-          item.score = 0
-        })
-      } else {
-        return []
+    const recs = page.recommendations?.map((item) => { 
+      if (item) {
+        item.score = 0
       }
-    })()
+    }) ?? []
 
     // the following block generates scores by getting all pages the current page links to
     // getting the pages *those* pages link to, and counting how many times the second set
