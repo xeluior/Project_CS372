@@ -76,6 +76,7 @@ class Filter extends React.Component {
       tropeFilterData: [],
       namespaceData: null,
       resultsFound: false, // false if the database hasn't returned anything, true if it has
+      searchTimeout: null, // Timer for alerting the user that no results have been found if a threshold is met
     }
 
     this.getUncheckedTropeFilters = this.getUncheckedTropeFilters.bind(this)
@@ -254,8 +255,11 @@ class Filter extends React.Component {
 
   // Called whenever filterdata's state has changed
   componentDidUpdate(prevProps, prevState) {
-    if (this.state.mediaData !== null)
+    if (this.state.mediaData !== null) {
       try {
+        if (this.state.searchTimeout) {
+          clearTimeout(this.state.searchTimeout)
+        }
         if (
           prevState.mediaFilterData !== this.state.mediaFilterData ||
           prevState.tropeFilterData !== this.state.tropeFilterData
@@ -272,6 +276,11 @@ class Filter extends React.Component {
       } catch (error) {
         console.error(error)
       }
+    } else {
+      const _searchTimeout = setTimeout(() => {
+        alert("No results found for the specified query.")
+      }, 20000)
+    }
   }
 
   render() {
