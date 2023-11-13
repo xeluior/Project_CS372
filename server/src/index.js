@@ -28,7 +28,6 @@ const port = process.env.PORT || 8080
 // this will fail if the environment variable is not present
 const mongo = new mongodb.MongoClient(process.env.MONGO_URI)
 const media = mongo.db(db_name).collection(pages_collection_name)
-
 const users = mongo.db(db_name).collection(user_collection_name)
 
 // use additional routes
@@ -77,21 +76,33 @@ app.get("/search", (req, res) => {
 app.post("/watch-later", (req, res) => {
     /*get user id based on token (session id)
     add namespace:id of item to json attribute*/
-
+    
     //check if user is logged in
     if (req.session.uid !== null) {
-        users.update(
-            {
-                id: req.session.uid,
-            },
-            { 
-                // make watch-later an array and .add() trope
-                $set: {
-                    watch_later: watch_later.add(req.query.id)
+        const watch_later = { id: req.query.id, title: req.body }
+        //if watch-later exists, update
+        if (!find(watch_later)) {
+            users.update(
+                {
+                    id: req.session.uid,
+                },
+                { 
+                    // make watch-later an array and .add() trope
+                    $addToSet: {
+                        watch_later: watch_later
+                    }
                 }
-            }
-        )
-        res.sendStatus(200)
+            )
+            res.sendStatus(200)
+        }
+        else {
+            users.insert(
+                {
+                    watch_later: {id: req.query.id, title: req.body}
+                }
+            )
+            res.sendStatus(200)
+        }
     }
     else {
         res.sendStatus(403)
