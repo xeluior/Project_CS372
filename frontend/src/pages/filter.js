@@ -124,7 +124,7 @@ class Filter extends React.Component {
     // If statement allows the app to function in testing and prod by checking for the .env var REACT_APP_API_URL, which is only present on the testing side
     if (process.env.REACT_APP_API_URL === undefined) {
       const currentUrl = window.location.href // Get the current URL
-      const endIndex = currentUrl.lastIndexOf("/") // Find the last occurrence of ".app"
+      const endIndex = currentUrl.lastIndexOf("/") // Find the last occurrence of "/"
       const modifiedUrl =
         endIndex >= 0 ? currentUrl.slice(0, endIndex) : currentUrl // If not found, leave URL untouched.
 
