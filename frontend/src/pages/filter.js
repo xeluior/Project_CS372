@@ -8,17 +8,17 @@ import CheckboxList from "../component/checkboxlist"
 const FilterContainer = styled.div`
   display: flex;
   gap: 20px;
-`;
+`
 
 const FiltersSection = styled.div`
   display: flex;
   flex-direction: column;
   gap: 20px;
-`;
+`
 
 const WhiteText = styled.p`
   color: white;
-`;
+`
 
 // All media related namespaces on the tvtropes site.
 let mediaNamespaces = [
@@ -75,6 +75,7 @@ class Filter extends React.Component {
       mediaFilterData: [], //Data returned from checkboxlist.js callback (All currently unchecked boxes)
       tropeFilterData: [],
       namespaceData: null,
+      resultsFound: false, // false if the database hasn't returned anything, true if it has
     }
 
     this.getUncheckedTropeFilters = this.getUncheckedTropeFilters.bind(this)
@@ -87,6 +88,7 @@ class Filter extends React.Component {
     this.setState({ tropeFilterData: [] })
     this.setState({ mediaCheckboxData: null })
     this.setState({ tropeCheckboxData: null })
+    this.setState({ resultsFound: false })
 
     await this.fetchDataFromDatabase()
   }
@@ -136,11 +138,19 @@ class Filter extends React.Component {
     try {
       const response = await fetch(apiUrl)
       const data = await response.json()
+
+      if (data.length !== 0) {
+        this.setState({ resultsFound: true })
+      }
+
       this.setState({ mediaData: this.filterOutTropes(data) }) // Set the retrieved data in state
       this.setState({ mediaCheckboxData: this.getFilterOptions(data) }) // Set filter options in state
       this.setState({ nonTropeData: this.filterOutTropes(data) })
-      this.setState({ tropeCheckboxData: this.convertToCheckboxData(this.getTropesFromMedia(this.filterOutTropes(data)).sort()) })
-
+      this.setState({
+        tropeCheckboxData: this.convertToCheckboxData(
+          this.getTropesFromMedia(this.filterOutTropes(data)).sort()
+        ),
+      })
     } catch (error) {
       console.error("Error fetching data from the database: ", error)
     }
@@ -244,25 +254,29 @@ class Filter extends React.Component {
 
   // Called whenever filterdata's state has changed
   componentDidUpdate(prevProps, prevState) {
-    try {
-      if (prevState.mediaFilterData !== this.state.mediaFilterData || prevState.tropeFilterData !== this.state.tropeFilterData) {
-        let result = this.filterMediaNamespaces(
-          this.state.nonTropeData,
-          this.state.mediaFilterData
-        )
-        result = this.filterMediaTropes(result, this.state.tropeFilterData) // Removing filtered tropes
-        if (result) {
-          this.setState({ mediaData: result })
+    if (this.state.mediaData !== null)
+      try {
+        if (
+          prevState.mediaFilterData !== this.state.mediaFilterData ||
+          prevState.tropeFilterData !== this.state.tropeFilterData
+        ) {
+          let result = this.filterMediaNamespaces(
+            this.state.nonTropeData,
+            this.state.mediaFilterData
+          )
+          result = this.filterMediaTropes(result, this.state.tropeFilterData) // Removing filtered tropes
+          if (result) {
+            this.setState({ mediaData: result })
+          }
         }
+      } catch (error) {
+        console.error(error)
       }
-    } catch (error) {
-      console.log(error)
-    }
   }
 
-
   render() {
-    const { mediaData, mediaCheckboxData, tropeCheckboxData } = this.state;
+    const { mediaData, mediaCheckboxData, tropeCheckboxData, resultsFound } =
+      this.state
 
     return (
       <div>
@@ -272,7 +286,7 @@ class Filter extends React.Component {
         <FilterContainer>
           <FiltersSection>
             <div>
-              {mediaData ? (
+              {mediaData && resultsFound ? (
                 <CheckboxList
                   items={mediaCheckboxData}
                   onUncheckedItems={this.getUncheckedMediaFilters}
@@ -282,7 +296,7 @@ class Filter extends React.Component {
               )}
             </div>
             <div>
-              {mediaData ? (
+              {mediaData && resultsFound ? (
                 <CheckboxList
                   items={tropeCheckboxData}
                   onUncheckedItems={this.getUncheckedTropeFilters}
@@ -292,15 +306,15 @@ class Filter extends React.Component {
               )}
             </div>
           </FiltersSection>
-          {mediaData ? (
+          {mediaData && resultsFound ? (
             <MediaGrid mediaData={mediaData} />
           ) : (
             <WhiteText>Loading results...</WhiteText>
           )}
         </FilterContainer>
       </div>
-    );
+    )
   }
 }
 
-export default Filter;
+export default Filter
