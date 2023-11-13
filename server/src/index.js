@@ -81,7 +81,7 @@ app.post("/watch-later", (req, res) => {
     if (req.session.uid !== null) {
         const watch_later = { id: req.query.id, title: req.body }
         //if watch-later exists, update
-        if (!find(watch_later)) {
+        if (!media.find(watch_later)) {
             users.update(
                 {
                     id: req.session.uid,
