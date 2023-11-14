@@ -257,7 +257,9 @@ class Filter extends React.Component {
   componentDidUpdate(prevProps, prevState) {
     if (this.state.mediaData !== null) {
       try {
-        if (this.state.searchTimeout) {
+        if (this.state.searchTimeout && this.state.mediaData.length !== 0) {
+          console.log("Time cancelled!!!")
+          console.log("METADATA: ", this.state.mediaData)
           clearTimeout(this.state.searchTimeout)
           this.setState({ searchTimeout: null })
         }
@@ -279,9 +281,10 @@ class Filter extends React.Component {
       }
     } else {
       if (!this.state.searchTimeout) {
+        console.log("TIMER STARTED")
         const searchTimeout = setTimeout(() => {
           alert("No results found for the specified query.")
-        }, 10000)
+        }, 20000)
 
         this.setState({ searchTimeout })
       }
