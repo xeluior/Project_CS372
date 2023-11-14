@@ -259,6 +259,7 @@ class Filter extends React.Component {
       try {
         if (this.state.searchTimeout) {
           clearTimeout(this.state.searchTimeout)
+          this.setState({ searchTimeout: null })
         }
         if (
           prevState.mediaFilterData !== this.state.mediaFilterData ||
@@ -277,9 +278,13 @@ class Filter extends React.Component {
         console.error(error)
       }
     } else {
-      const _searchTimeout = setTimeout(() => {
-        alert("No results found for the specified query.")
-      }, 20000)
+      if (!this.state.searchTimeout) {
+        const searchTimeout = setTimeout(() => {
+          alert("No results found for the specified query.")
+        }, 10000)
+
+        this.setState({ searchTimeout })
+      }
     }
   }
 
