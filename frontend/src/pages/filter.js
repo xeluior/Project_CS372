@@ -97,6 +97,15 @@ class Filter extends React.Component {
   // Takes in the jsonified database query results and returns a list of the media namespaces in the results (Not tropes) for creating checkboxes
   getFilterOptions(data) {
     let resultList = []
+    /*
+    for (let i = 0; i < data.length; i++) {
+      let currentNameSpace = data[i]["ns"]
+      if (mediaNamespaces.includes(currentNameSpace)) {
+        let currentNameSpaceCount = 1
+
+
+      }
+    } */
 
     for (let i = 0; i < data.length; i++) {
       if (
@@ -107,13 +116,13 @@ class Filter extends React.Component {
         resultList.push(data[i]["ns"])
       }
     }
-
     let jsonResult = [{}]
     // Formatting the result as a mappable object
     for (let i = 0; i < resultList.length; i++) {
       jsonResult[i] = {
         id: i,
         label: resultList[i],
+        // count: resultList[i]["count"], // New element of json obj
       }
     }
 
@@ -144,12 +153,14 @@ class Filter extends React.Component {
         this.setState({ resultsFound: true })
       }
 
-      this.setState({ mediaData: this.filterOutTropes(data) }) // Set the retrieved data in state
-      this.setState({ mediaCheckboxData: this.getFilterOptions(data) }) // Set filter options in state
-      this.setState({ nonTropeData: this.filterOutTropes(data) })
+      let filteredData = this.filterOutTropes(data)
+
+      this.setState({ mediaData: filteredData }) // Set the retrieved data in state
+      this.setState({ mediaCheckboxData: this.getFilterOptions(filteredData) }) // Set filter options in state (MAY HAVE TO CHANGE BACK TO JUST "data" AS ARG)
+      this.setState({ nonTropeData: filteredData })
       this.setState({
         tropeCheckboxData: this.convertToCheckboxData(
-          this.getTropesFromMedia(this.filterOutTropes(data)).sort()
+          this.getTropesFromMedia(filteredData).sort()
         ),
       })
     } catch (error) {
@@ -228,7 +239,7 @@ class Filter extends React.Component {
     return jsonResult
   }
 
-  // Takes a list of media and a list of tropes and returns an array containing only the meida that does not contain any of those tropes
+  // Takes a list of media and a list of tropes and returns an array containing only the media that does not contain any of those tropes
   filterMediaTropes(mediaList, tropesToFilter) {
     let resultArray = []
     let validFlag = true
@@ -258,8 +269,6 @@ class Filter extends React.Component {
     if (this.state.mediaData !== null) {
       try {
         if (this.state.searchTimeout && this.state.mediaData.length !== 0) {
-          console.log("Time cancelled!!!")
-          console.log("METADATA: ", this.state.mediaData)
           clearTimeout(this.state.searchTimeout)
           this.setState({ searchTimeout: null })
         }
@@ -281,7 +290,6 @@ class Filter extends React.Component {
       }
     } else {
       if (!this.state.searchTimeout) {
-        console.log("TIMER STARTED")
         const searchTimeout = setTimeout(() => {
           alert("No results found for the specified query.")
         }, 20000)
