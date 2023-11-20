@@ -85,7 +85,7 @@ class CheckboxList extends Component {
                   checked={checkedItems.has(item.id)}
                   onChange={() => this.handleCheckboxChange(item.id)}
                 />
-                {item.label}
+                {item.label + " (" + item.count + ")"}
               </CheckboxLabel>
             </div>
           ))}

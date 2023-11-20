@@ -96,37 +96,31 @@ class Filter extends React.Component {
 
   // Takes in the jsonified database query results and returns a list of the media namespaces in the results (Not tropes) for creating checkboxes
   getFilterOptions(data) {
-    let resultList = []
-    /*
+    // let resultList = []
+
+    let newResultList = [{}]
+    let nameSpaces = []
+    // Getting list of (media) namespaces in the data
     for (let i = 0; i < data.length; i++) {
       let currentNameSpace = data[i]["ns"]
-      if (mediaNamespaces.includes(currentNameSpace)) {
-        let currentNameSpaceCount = 1
-
-
-      }
-    } */
-
-    for (let i = 0; i < data.length; i++) {
-      if (
-        mediaNamespaces.includes(data[i]["ns"]) &&
-        !resultList.includes(data[i]["ns"])
-      ) {
-        // If the namespaece is a media namespace and is not already in our list
-        resultList.push(data[i]["ns"])
-      }
-    }
-    let jsonResult = [{}]
-    // Formatting the result as a mappable object
-    for (let i = 0; i < resultList.length; i++) {
-      jsonResult[i] = {
-        id: i,
-        label: resultList[i],
-        // count: resultList[i]["count"], // New element of json obj
+      if (!nameSpaces.includes(currentNameSpace)) {
+        nameSpaces.push(currentNameSpace)
       }
     }
 
-    return jsonResult
+    // Getting counts of each media type
+    for (let i = 0; i < nameSpaces.length; i++) {
+      let currentCount = 0
+      for (let k = 0; k < data.length; k++) {
+        if (data[k]["ns"] === nameSpaces[i]) {
+          currentCount++
+        }
+      }
+
+      newResultList[i] = { id: i, label: nameSpaces[i], count: currentCount }
+    }
+    console.log("NEW LIST ", newResultList)
+    return newResultList
   }
 
   async fetchDataFromDatabase() {
