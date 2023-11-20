@@ -96,10 +96,9 @@ class Filter extends React.Component {
 
   // Takes in the jsonified database query results and returns a list of the media namespaces in the results (Not tropes) for creating checkboxes
   getFilterOptions(data) {
-    // let resultList = []
-
     let newResultList = [{}]
     let nameSpaces = []
+
     // Getting list of (media) namespaces in the data
     for (let i = 0; i < data.length; i++) {
       let currentNameSpace = data[i]["ns"]
@@ -119,7 +118,9 @@ class Filter extends React.Component {
 
       newResultList[i] = { id: i, label: nameSpaces[i], count: currentCount }
     }
-    console.log("NEW LIST ", newResultList)
+
+    newResultList.sort((a, b) => b.count - a.count);
+
     return newResultList
   }
 
@@ -152,11 +153,7 @@ class Filter extends React.Component {
       this.setState({ mediaData: filteredData }) // Set the retrieved data in state
       this.setState({ mediaCheckboxData: this.getFilterOptions(filteredData) }) // Set filter options in state (MAY HAVE TO CHANGE BACK TO JUST "data" AS ARG)
       this.setState({ nonTropeData: filteredData })
-      this.setState({
-        tropeCheckboxData: this.convertToCheckboxData(
-          this.getTropesFromMedia(filteredData).sort()
-        ),
-      })
+      this.setState({ tropeCheckboxData: this.getTropesFromMedia(filteredData)})
     } catch (error) {
       console.error("Error fetching data from the database: ", error)
     }
@@ -204,6 +201,8 @@ class Filter extends React.Component {
 
   getTropesFromMedia(mediaList) {
     let tropesList = []
+
+    // Get list of all tropes in database results
     for (let i = 0; i < mediaList.length; i++) {
       for (let k = 0; k < mediaList[i]["links"].length; k++) {
         if (mediaList[i]["links"][k]["ns"] === "Main") {
@@ -215,20 +214,30 @@ class Filter extends React.Component {
         }
       }
     }
-
-    return tropesList
-  }
-
-  // Converts the array of strings that is the tropes list and converts it to a json/mappable format
-  convertToCheckboxData(tropesList) {
     let jsonResult = [{}]
-    // Formatting the result as a mappable object
+
+    console.log("MEDIA", mediaList)
+
     for (let i = 0; i < tropesList.length; i++) {
+      let currentCount = 0
+      let currentTrope = tropesList[i]
+      for (let k = 0; k < mediaList.length; k++) {
+        for (let j = 0; j < mediaList[k]["links"].length; j++) {
+          if (mediaList[k]["links"][j]["id"] === currentTrope) {
+            currentCount++
+            continue
+          }
+        }
+      }
+
       jsonResult[i] = {
         id: i,
         label: tropesList[i],
+        count: currentCount,
       }
     }
+
+    jsonResult.sort((a, b) => b.count - a.count);
 
     return jsonResult
   }
