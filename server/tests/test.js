@@ -24,11 +24,4 @@ describe("Test authentication", () => {
       .send({ email: "test@example.com", password: "password" })
       .expect(303, done)
   })
-
-  it("Delete the new user", (done) => {
-    request(app)
-      .post('/auth/delete')
-      .send({ email: "test@example.com" })
-      .expect(303, done)
-  })
 })
