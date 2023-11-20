@@ -14,7 +14,7 @@ describe("Test authentication", () => {
   it("Add a new user", (done) => {
     request(app)
       .post('/auth/create')
-      .send({ email: "test@example.com", password: "password" })
+      .send("email=test@example.com&password=password")
       .expect(303, done)
   })
 
