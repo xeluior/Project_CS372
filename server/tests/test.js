@@ -5,7 +5,7 @@ const app = require('../src/index.js')
 describe("Test authentication", () => {
   beforeAll(() => {
     const client = new mongodb.MongoClient(process.env.MONGO_URI)
-    const db = client.db(process.env.DB)
+    const db = client.db('test')
     const users = db.collection('users')
 
     users.deleteMany({})
