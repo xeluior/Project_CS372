@@ -81,6 +81,19 @@ class MediaPoster extends Component {
     this.setState({ isImageError: true })
   }
 
+  handleContainerClick = () => {
+    // Redirect to /recommend endpoint on the same domain
+    window.location.href = "/recommend";
+
+    // Call a function to set a session storage variable with key "recommendation" and value as the title
+    this.setSessionStorageVariable(this.props.title);
+  }
+
+  setSessionStorageVariable = (title) => {
+    // Set session storage variable with key "recommendation" and value as the title
+    sessionStorage.setItem('recommend', title);
+  }
+
   render() {
     const { isHovered, isImageError } = this.state
     const { title, synopsis, posterUrl } = this.props
@@ -89,6 +102,7 @@ class MediaPoster extends Component {
       <Container
         onMouseEnter={this.handleMouseEnter}
         onMouseLeave={this.handleMouseLeave}
+        onClick={this.handleContainerClick}
       >
         <ImageContainer>
           <PosterImage
