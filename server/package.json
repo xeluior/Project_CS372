@@ -4,7 +4,7 @@
   "description": "The server-side component to this project",
   "main": "src/index.js",
   "scripts": {
-    "test": "jest",
+    "test": "jest --forceExit",
     "start": "npm run build --prefix ../frontend && node src/index.js"
   },
   "dependencies": {
