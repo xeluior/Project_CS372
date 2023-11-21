@@ -53,7 +53,6 @@ exports.check_token = (req, res, next) => {
 }
 
 // middleware for creating a user
-exports.create_user = (req, res) => {
 exports.create_user = async (req, res) => {
     // hash the password
     const hashed_pwd = await bcrypt.hash(req.body.password, salt_rounds)
