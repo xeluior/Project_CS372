@@ -1,5 +1,17 @@
+// Navbar.js
 import React, { useState } from "react";
-import {NavbarContainer, LeftContainer, RightContainer, NavbarExtenedContainer, NavbarInnerContainer, NavbarLinkContainer,  NavbarLink, SearchPNG, SearchInput} from "../styles/NavbarStyle";
+import { Link } from "react-router-dom";
+import {
+  NavbarContainer,
+  LeftContainer,
+  RightContainer,
+  NavbarInnerContainer,
+  NavbarLinkContainer,
+  NavbarLink,
+  SearchPNG,
+  SearchInput,
+  LogoutButton,
+} from "../styles/NavbarStyle";
 import Image from "../assets/Search.png";
 
 function Navbar() {
@@ -11,13 +23,12 @@ function Navbar() {
 
     return (
         <NavbarContainer>
-
             <NavbarInnerContainer>
                 <LeftContainer>
                     <NavbarLinkContainer>
-                    <NavbarLink to="/">Home</NavbarLink>
-                    <NavbarLink to="/recommend">Recommend</NavbarLink>
-                    <NavbarLink to="/login">Login</NavbarLink>
+                        <NavbarLink to="/">Home</NavbarLink>
+                        <NavbarLink to="/recommend">Recommend</NavbarLink>
+                        <NavbarLink to="/login">Login</NavbarLink>
                     </NavbarLinkContainer>
                 </LeftContainer>
                 <RightContainer>
@@ -25,11 +36,9 @@ function Navbar() {
                     {isSearchBarOpen && (
                         <SearchInput type="text" placeholder="Search..." />
                     )}
+                    <LogoutButton as={Link} to="/logout">Logout</LogoutButton>
                 </RightContainer>
             </NavbarInnerContainer>
-
-            <NavbarExtenedContainer></NavbarExtenedContainer>
-            
         </NavbarContainer>
     );
 }

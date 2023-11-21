@@ -77,3 +77,19 @@ export const SearchInput = styled.input`
     vertical-align: middle;  // This ensures the input aligns with the middle of adjacent text or image element
 `;
 
+export const LogoutButton = styled(Link)`
+    background-color: #f56565;
+    color: white;
+    font-size: 16px;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block; // To align properly with other inline elements like text
+    margin-left: 10px; // Added margin to the left
+
+    &:hover {
+        background-color: #c53030;
+    }
+`;
