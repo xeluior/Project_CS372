@@ -4,6 +4,8 @@ const mongodb = require("mongodb");
 const session = require('express-session')
 const auth = require('./auth.router.js')
 const meta = require('./meta.router.js')
+const recommend = require('./recommend.js')
+const likes = require('./likes.router.js')
 const cors = require('cors')
 const path = require('path')
 
@@ -11,7 +13,7 @@ const path = require('path')
 require("dotenv").config()
 
 // configuration constants
-const db_name = 'media-db'
+const db_name = process.env.DB
 const pages_collection_name = 'pages'
 const user_collection_name = 'users'
 
@@ -39,19 +41,11 @@ app.use(session({
 }))
 app.use('/auth', auth.router)
 app.use('/meta', meta.router)
+app.use('/likes', likes.router)
 
 // recommendation route
 // takes the "ns" and "id" query parameters to uniquely identify the media to get
-app.get("/recommendation", (req, res) => {
-    media.findOne({
-        ns: req.query.ns,
-        id: req.query.id
-    })
-    .then((result) => {
-        /* TODO: actually recommend things */
-        res.send(result)
-    })
-})
+app.get("/recommendation", recommend.check_cache, recommend.get_recommendations)
 
 // search route
 // a "text" index needs to be made on the title field before this will work
