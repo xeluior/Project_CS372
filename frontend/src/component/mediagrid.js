@@ -33,6 +33,7 @@ const StyledButton = styled.button`
   border-radius: 5px;
   cursor: pointer;
   transition: background-color 0.3s ease;
+  max-height: 40px;
 
   &:disabled {
     background-color: #ccc;
