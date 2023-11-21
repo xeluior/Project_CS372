@@ -7,7 +7,7 @@ const Container = styled.div`
   gap: 5px;
   max-height: ${(props) => props.maxHeight}px; // Set maximum height dynamically
   overflow-y: auto; // Add a vertical scrollbar when content overflows
-  overflow-x: hidden
+  overflow-x: hidden;
 `
 const SideDiv = styled.div`
   width: 275px; // maybe a value instead

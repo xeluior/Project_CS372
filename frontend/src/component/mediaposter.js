@@ -83,15 +83,15 @@ class MediaPoster extends Component {
 
   handleContainerClick = () => {
     // Redirect to /recommend endpoint on the same domain
-    window.location.href = "/recommend";
+    window.location.href = "/recommend"
 
     // Call a function to set a session storage variable with key "recommendation" and value as the title
-    this.setSessionStorageVariable(this.props.title);
+    this.setSessionStorageVariable(this.props.title)
   }
 
   setSessionStorageVariable = (title) => {
     // Set session storage variable with key "recommendation" and value as the title
-    sessionStorage.setItem('recommend', title);
+    sessionStorage.setItem("recommend", title)
   }
 
   render() {

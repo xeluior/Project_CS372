@@ -119,7 +119,7 @@ class Filter extends React.Component {
       newResultList[i] = { id: i, label: nameSpaces[i], count: currentCount }
     }
 
-    newResultList.sort((a, b) => b.count - a.count);
+    newResultList.sort((a, b) => b.count - a.count)
 
     return newResultList
   }
@@ -153,7 +153,9 @@ class Filter extends React.Component {
       this.setState({ mediaData: filteredData }) // Set the retrieved data in state
       this.setState({ mediaCheckboxData: this.getFilterOptions(filteredData) }) // Set filter options in state (MAY HAVE TO CHANGE BACK TO JUST "data" AS ARG)
       this.setState({ nonTropeData: filteredData })
-      this.setState({ tropeCheckboxData: this.getTropesFromMedia(filteredData)})
+      this.setState({
+        tropeCheckboxData: this.getTropesFromMedia(filteredData),
+      })
     } catch (error) {
       console.error("Error fetching data from the database: ", error)
     }
@@ -237,7 +239,7 @@ class Filter extends React.Component {
       }
     }
 
-    jsonResult.sort((a, b) => b.count - a.count);
+    jsonResult.sort((a, b) => b.count - a.count)
 
     return jsonResult
   }

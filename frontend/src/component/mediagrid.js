@@ -1,7 +1,7 @@
-import React, { Component } from "react";
-import styled from "styled-components";
-import MediaPoster from "./mediaposter";
-import PropTypes from "prop-types";
+import React, { Component } from "react"
+import styled from "styled-components"
+import MediaPoster from "./mediaposter"
+import PropTypes from "prop-types"
 
 const MainContainer = styled.div`
   display: grid;
@@ -9,20 +9,20 @@ const MainContainer = styled.div`
   gap: 10px;
   flex: 1;
   overflow: hidden;
-`;
+`
 
 const GridContainer = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   grid-auto-rows: 400px;
   gap: 20px;
-`;
+`
 
 const ButtonRow = styled.div`
   display: flex;
   justify-content: center;
   margin-top: 10px;
-`;
+`
 
 const StyledButton = styled.button`
   padding: 10px;
@@ -47,15 +47,15 @@ const StyledButton = styled.button`
   &:first-child {
     margin-right: 10px;
   }
-`;
+`
 
-let key = 0;
+let key = 0
 
 class MediaGrid extends Component {
   state = {
     startIndex: 0,
     itemsPerPage: 20,
-  };
+  }
 
   handleNextClick = () => {
     this.setState(
@@ -63,8 +63,8 @@ class MediaGrid extends Component {
         startIndex: prevState.startIndex + prevState.itemsPerPage,
       }),
       () => window.scrollTo(0, 0) // Scroll to the top after updating state
-    );
-  };
+    )
+  }
 
   handlePrevClick = () => {
     this.setState(
@@ -72,13 +72,13 @@ class MediaGrid extends Component {
         startIndex: Math.max(0, prevState.startIndex - prevState.itemsPerPage),
       }),
       () => window.scrollTo(0, 0) // Scroll to the top after updating state
-    );
-  };
+    )
+  }
 
   render() {
-    const { mediaData } = this.props;
-    const { startIndex, itemsPerPage } = this.state;
-    const visibleItems = mediaData.slice(startIndex, startIndex + itemsPerPage);
+    const { mediaData } = this.props
+    const { startIndex, itemsPerPage } = this.state
+    const visibleItems = mediaData.slice(startIndex, startIndex + itemsPerPage)
 
     return (
       <MainContainer>
@@ -107,7 +107,7 @@ class MediaGrid extends Component {
           </StyledButton>
         </ButtonRow>
       </MainContainer>
-    );
+    )
   }
 }
 
@@ -119,6 +119,6 @@ MediaGrid.propTypes = {
       posterUrl: PropTypes.string,
     })
   ).isRequired,
-};
+}
 
-export default MediaGrid;
+export default MediaGrid
