@@ -34,6 +34,13 @@ exports.check_password = (req, res) => {
     })
 }
 
+exports.logout = (req, res) => {
+  req.session.destroy(() => {
+    res.clearCookie("connect.sid")
+    res.redirect(303, '/')
+  })
+}
+
 // middleware for validating an existing session
 exports.check_token = (req, res, next) => {
     users.findOne({ email: req.session.email }).then((user) => {
@@ -57,6 +64,16 @@ exports.create_user = async (req, res) => {
     })
     // send the user to the login screen
     res.redirect(303, '/login')
+}
+
+// middleware to ensure the user is authenticated
+exports.ensure = (req, res, next) => {
+  if (!req.session.uid) {
+    res.sendStatus(403)
+    return
+  }
+
+  next()
 }
 
 // middleware for removing user
