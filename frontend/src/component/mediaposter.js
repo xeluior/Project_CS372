@@ -94,6 +94,8 @@ class MediaPoster extends Component {
     sessionStorage.setItem("recommend", title)
   }
 
+
+
   render() {
     const { isHovered, isImageError } = this.state
     const { title, synopsis, posterUrl } = this.props

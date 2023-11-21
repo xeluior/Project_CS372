@@ -218,8 +218,6 @@ class Filter extends React.Component {
     }
     let jsonResult = [{}]
 
-    console.log("MEDIA", mediaList)
-
     for (let i = 0; i < tropesList.length; i++) {
       let currentCount = 0
       let currentTrope = tropesList[i]

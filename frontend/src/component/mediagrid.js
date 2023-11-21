@@ -2,6 +2,7 @@ import React, { Component } from "react"
 import styled from "styled-components"
 import MediaPoster from "./mediaposter"
 import PropTypes from "prop-types"
+import axios from 'axios';
 
 const MainContainer = styled.div`
   display: grid;
@@ -75,6 +76,21 @@ class MediaGrid extends Component {
     )
   }
 
+  fetchImage = async (title) => {
+    try {
+      const response = await axios.get(`/meta/movie?title=${title}`)
+      const data = response.data
+      console.log("NAME: ", data.poster)
+
+      if (!data.title) throw new Error("Movie not found")
+
+
+      return data.poster
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
   render() {
     const { mediaData } = this.props
     const { startIndex, itemsPerPage } = this.state
@@ -88,7 +104,7 @@ class MediaGrid extends Component {
               key={key++}
               title={mediaItem.title}
               synopsis={mediaItem.url}
-              posterUrl={mediaItem.posterUrl} // Remove quotes around mediaItem.posterUrl
+              posterUrl={this.fetchImage(mediaItem.title)} // Remove quotes around mediaItem.posterUrl
             />
           ))}
         </GridContainer>
