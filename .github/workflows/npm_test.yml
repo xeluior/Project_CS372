@@ -28,5 +28,10 @@ jobs:
     - run: npm ci
       working-directory: ./server
     - run: npm test
+      env:
+        MONGO_URI: ${{ secrets.MONGO_URI }}
+        DB: test
+        MEDIA_COLLECTION: pages
+        SESSION_SECRET: somebase64here
       working-directory: ./server
 
