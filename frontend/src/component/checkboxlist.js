@@ -5,6 +5,9 @@ const Container = styled.div`
   display: grid;
   grid-template-rows: repeat(auto-fill, 20px);
   gap: 5px;
+  max-height: ${(props) => props.maxHeight}px; // Set maximum height dynamically
+  overflow-y: auto; // Add a vertical scrollbar when content overflows
+  overflow-x: hidden;
 `
 const SideDiv = styled.div`
   width: 275px; // maybe a value instead
@@ -69,6 +72,8 @@ class CheckboxList extends Component {
     const { checkedItems } = this.state
     const filteredItems = this.getFilteredItems()
 
+    const maxHeight = Math.min(filteredItems.length * 25, 675)
+
     return (
       <SideDiv>
         <SearchBar
@@ -76,7 +81,7 @@ class CheckboxList extends Component {
           placeholder="Search..."
           onChange={this.handleSearch}
         />
-        <Container>
+        <Container maxHeight={maxHeight}>
           {filteredItems.map((item) => (
             <div key={item.id}>
               <CheckboxLabel>
@@ -85,7 +90,7 @@ class CheckboxList extends Component {
                   checked={checkedItems.has(item.id)}
                   onChange={() => this.handleCheckboxChange(item.id)}
                 />
-                {item.label}
+                {item.label + " (" + item.count + ")"}
               </CheckboxLabel>
             </div>
           ))}

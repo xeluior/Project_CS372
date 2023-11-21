@@ -1,7 +1,6 @@
 import React, { Component } from "react"
 import styled from "styled-components"
 
-// These styled components were created by ChatGPT
 const Container = styled.div`
   width: 250px;
   height: 375px;
@@ -14,12 +13,23 @@ const Container = styled.div`
 const ImageContainer = styled.div`
   width: 100%;
   height: 100%;
+  position: relative;
 `
 
 const PosterImage = styled.img`
   width: 100%;
   height: 100%;
   object-fit: cover;
+`
+
+const AltText = styled.div`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 1.5rem;
+  text-align: center;
 `
 
 const Overlay = styled.div`
@@ -49,13 +59,13 @@ const Synopsis = styled.p`
   font-size: 1rem;
   text-align: center;
 `
-// End ChatGTP generated code
 
 class MediaPoster extends Component {
   constructor(props) {
     super(props)
     this.state = {
       isHovered: false,
+      isImageError: false,
     }
   }
 
@@ -67,17 +77,40 @@ class MediaPoster extends Component {
     this.setState({ isHovered: false })
   }
 
+  handleImageError = () => {
+    this.setState({ isImageError: true })
+  }
+
+  handleContainerClick = () => {
+    // Redirect to /recommend endpoint on the same domain
+    window.location.href = "/recommend"
+
+    // Call a function to set a session storage variable with key "recommendation" and value as the title
+    this.setSessionStorageVariable(this.props.title)
+  }
+
+  setSessionStorageVariable = (title) => {
+    // Set session storage variable with key "recommendation" and value as the title
+    sessionStorage.setItem("recommend", title)
+  }
+
   render() {
-    const { isHovered } = this.state
+    const { isHovered, isImageError } = this.state
     const { title, synopsis, posterUrl } = this.props
 
     return (
       <Container
         onMouseEnter={this.handleMouseEnter}
         onMouseLeave={this.handleMouseLeave}
+        onClick={this.handleContainerClick}
       >
         <ImageContainer>
-          <PosterImage src={posterUrl} alt={title} />
+          <PosterImage
+            src={posterUrl}
+            alt={title}
+            onError={this.handleImageError}
+          />
+          {isImageError && <AltText>{title}</AltText>}
         </ImageContainer>
         <Overlay style={{ opacity: isHovered ? 1 : 0 }}>
           <Title>{title}</Title>

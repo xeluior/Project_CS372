@@ -8,17 +8,17 @@ import CheckboxList from "../component/checkboxlist"
 const FilterContainer = styled.div`
   display: flex;
   gap: 20px;
-`;
+`
 
 const FiltersSection = styled.div`
   display: flex;
   flex-direction: column;
   gap: 20px;
-`;
+`
 
 const WhiteText = styled.p`
   color: white;
-`;
+`
 
 // All media related namespaces on the tvtropes site.
 let mediaNamespaces = [
@@ -75,6 +75,8 @@ class Filter extends React.Component {
       mediaFilterData: [], //Data returned from checkboxlist.js callback (All currently unchecked boxes)
       tropeFilterData: [],
       namespaceData: null,
+      resultsFound: false, // false if the database hasn't returned anything, true if it has
+      searchTimeout: null, // Timer for alerting the user that no results have been found if a threshold is met
     }
 
     this.getUncheckedTropeFilters = this.getUncheckedTropeFilters.bind(this)
@@ -87,34 +89,39 @@ class Filter extends React.Component {
     this.setState({ tropeFilterData: [] })
     this.setState({ mediaCheckboxData: null })
     this.setState({ tropeCheckboxData: null })
+    this.setState({ resultsFound: false })
 
     await this.fetchDataFromDatabase()
   }
 
   // Takes in the jsonified database query results and returns a list of the media namespaces in the results (Not tropes) for creating checkboxes
   getFilterOptions(data) {
-    let resultList = []
+    let newResultList = [{}]
+    let nameSpaces = []
 
+    // Getting list of (media) namespaces in the data
     for (let i = 0; i < data.length; i++) {
-      if (
-        mediaNamespaces.includes(data[i]["ns"]) &&
-        !resultList.includes(data[i]["ns"])
-      ) {
-        // If the namespaece is a media namespace and is not already in our list
-        resultList.push(data[i]["ns"])
+      let currentNameSpace = data[i]["ns"]
+      if (!nameSpaces.includes(currentNameSpace)) {
+        nameSpaces.push(currentNameSpace)
       }
     }
 
-    let jsonResult = [{}]
-    // Formatting the result as a mappable object
-    for (let i = 0; i < resultList.length; i++) {
-      jsonResult[i] = {
-        id: i,
-        label: resultList[i],
+    // Getting counts of each media type
+    for (let i = 0; i < nameSpaces.length; i++) {
+      let currentCount = 0
+      for (let k = 0; k < data.length; k++) {
+        if (data[k]["ns"] === nameSpaces[i]) {
+          currentCount++
+        }
       }
+
+      newResultList[i] = { id: i, label: nameSpaces[i], count: currentCount }
     }
 
-    return jsonResult
+    newResultList.sort((a, b) => b.count - a.count)
+
+    return newResultList
   }
 
   async fetchDataFromDatabase() {
@@ -124,7 +131,7 @@ class Filter extends React.Component {
     // If statement allows the app to function in testing and prod by checking for the .env var REACT_APP_API_URL, which is only present on the testing side
     if (process.env.REACT_APP_API_URL === undefined) {
       const currentUrl = window.location.href // Get the current URL
-      const endIndex = currentUrl.lastIndexOf("/") // Find the last occurrence of ".app"
+      const endIndex = currentUrl.lastIndexOf("/") // Find the last occurrence of "/"
       const modifiedUrl =
         endIndex >= 0 ? currentUrl.slice(0, endIndex) : currentUrl // If not found, leave URL untouched.
 
@@ -136,11 +143,19 @@ class Filter extends React.Component {
     try {
       const response = await fetch(apiUrl)
       const data = await response.json()
-      this.setState({ mediaData: this.filterOutTropes(data) }) // Set the retrieved data in state
-      this.setState({ mediaCheckboxData: this.getFilterOptions(data) }) // Set filter options in state
-      this.setState({ nonTropeData: this.filterOutTropes(data) })
-      this.setState({ tropeCheckboxData: this.convertToCheckboxData(this.getTropesFromMedia(this.filterOutTropes(data)).sort()) })
 
+      if (data.length !== 0) {
+        this.setState({ resultsFound: true })
+      }
+
+      let filteredData = this.filterOutTropes(data)
+
+      this.setState({ mediaData: filteredData }) // Set the retrieved data in state
+      this.setState({ mediaCheckboxData: this.getFilterOptions(filteredData) }) // Set filter options in state (MAY HAVE TO CHANGE BACK TO JUST "data" AS ARG)
+      this.setState({ nonTropeData: filteredData })
+      this.setState({
+        tropeCheckboxData: this.getTropesFromMedia(filteredData),
+      })
     } catch (error) {
       console.error("Error fetching data from the database: ", error)
     }
@@ -188,6 +203,8 @@ class Filter extends React.Component {
 
   getTropesFromMedia(mediaList) {
     let tropesList = []
+
+    // Get list of all tropes in database results
     for (let i = 0; i < mediaList.length; i++) {
       for (let k = 0; k < mediaList[i]["links"].length; k++) {
         if (mediaList[i]["links"][k]["ns"] === "Main") {
@@ -199,25 +216,35 @@ class Filter extends React.Component {
         }
       }
     }
-
-    return tropesList
-  }
-
-  // Converts the array of strings that is the tropes list and converts it to a json/mappable format
-  convertToCheckboxData(tropesList) {
     let jsonResult = [{}]
-    // Formatting the result as a mappable object
+
+    console.log("MEDIA", mediaList)
+
     for (let i = 0; i < tropesList.length; i++) {
+      let currentCount = 0
+      let currentTrope = tropesList[i]
+      for (let k = 0; k < mediaList.length; k++) {
+        for (let j = 0; j < mediaList[k]["links"].length; j++) {
+          if (mediaList[k]["links"][j]["id"] === currentTrope) {
+            currentCount++
+            continue
+          }
+        }
+      }
+
       jsonResult[i] = {
         id: i,
         label: tropesList[i],
+        count: currentCount,
       }
     }
+
+    jsonResult.sort((a, b) => b.count - a.count)
 
     return jsonResult
   }
 
-  // Takes a list of media and a list of tropes and returns an array containing only the meida that does not contain any of those tropes
+  // Takes a list of media and a list of tropes and returns an array containing only the media that does not contain any of those tropes
   filterMediaTropes(mediaList, tropesToFilter) {
     let resultArray = []
     let validFlag = true
@@ -244,25 +271,42 @@ class Filter extends React.Component {
 
   // Called whenever filterdata's state has changed
   componentDidUpdate(prevProps, prevState) {
-    try {
-      if (prevState.mediaFilterData !== this.state.mediaFilterData || prevState.tropeFilterData !== this.state.tropeFilterData) {
-        let result = this.filterMediaNamespaces(
-          this.state.nonTropeData,
-          this.state.mediaFilterData
-        )
-        result = this.filterMediaTropes(result, this.state.tropeFilterData) // Removing filtered tropes
-        if (result) {
-          this.setState({ mediaData: result })
+    if (this.state.mediaData !== null) {
+      try {
+        if (this.state.searchTimeout && this.state.mediaData.length !== 0) {
+          clearTimeout(this.state.searchTimeout)
+          this.setState({ searchTimeout: null })
         }
+        if (
+          prevState.mediaFilterData !== this.state.mediaFilterData ||
+          prevState.tropeFilterData !== this.state.tropeFilterData
+        ) {
+          let result = this.filterMediaNamespaces(
+            this.state.nonTropeData,
+            this.state.mediaFilterData
+          )
+          result = this.filterMediaTropes(result, this.state.tropeFilterData) // Removing filtered tropes
+          if (result) {
+            this.setState({ mediaData: result })
+          }
+        }
+      } catch (error) {
+        console.error(error)
       }
-    } catch (error) {
-      console.log(error)
+    } else {
+      if (!this.state.searchTimeout) {
+        const searchTimeout = setTimeout(() => {
+          alert("No results found for the specified query.")
+        }, 20000)
+
+        this.setState({ searchTimeout })
+      }
     }
   }
 
-
   render() {
-    const { mediaData, mediaCheckboxData, tropeCheckboxData } = this.state;
+    const { mediaData, mediaCheckboxData, tropeCheckboxData, resultsFound } =
+      this.state
 
     return (
       <div>
@@ -272,7 +316,7 @@ class Filter extends React.Component {
         <FilterContainer>
           <FiltersSection>
             <div>
-              {mediaData ? (
+              {mediaData && resultsFound ? (
                 <CheckboxList
                   items={mediaCheckboxData}
                   onUncheckedItems={this.getUncheckedMediaFilters}
@@ -282,7 +326,7 @@ class Filter extends React.Component {
               )}
             </div>
             <div>
-              {mediaData ? (
+              {mediaData && resultsFound ? (
                 <CheckboxList
                   items={tropeCheckboxData}
                   onUncheckedItems={this.getUncheckedTropeFilters}
@@ -292,15 +336,15 @@ class Filter extends React.Component {
               )}
             </div>
           </FiltersSection>
-          {mediaData ? (
+          {mediaData && resultsFound ? (
             <MediaGrid mediaData={mediaData} />
           ) : (
             <WhiteText>Loading results...</WhiteText>
           )}
         </FilterContainer>
       </div>
-    );
+    )
   }
 }
 
-export default Filter;
+export default Filter
