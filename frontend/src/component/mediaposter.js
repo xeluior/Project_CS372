@@ -23,7 +23,7 @@ const PosterImage = styled.img`
 `
 
 const AltText = styled.div`
-  position: absolute;
+  position: relative;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
@@ -94,11 +94,9 @@ class MediaPoster extends Component {
     sessionStorage.setItem("recommend", title)
   }
 
-
-
   render() {
     const { isHovered, isImageError } = this.state
-    const { title, synopsis, posterUrl } = this.props
+    const { title, synopsis, posterUrl, nameSpace } = this.props
 
     return (
       <Container
@@ -112,7 +110,7 @@ class MediaPoster extends Component {
             alt={title}
             onError={this.handleImageError}
           />
-          {isImageError && <AltText>{title}</AltText>}
+          {!isImageError && <AltText>{title}<br></br>{nameSpace}</AltText> }
         </ImageContainer>
         <Overlay style={{ opacity: isHovered ? 1 : 0 }}>
           <Title>{title}</Title>

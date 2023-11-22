@@ -2,7 +2,7 @@ import React, { Component } from "react"
 import styled from "styled-components"
 import MediaPoster from "./mediaposter"
 import PropTypes from "prop-types"
-import axios from 'axios';
+import axios from "axios"
 
 const MainContainer = styled.div`
   display: grid;
@@ -76,14 +76,26 @@ class MediaGrid extends Component {
     )
   }
 
+  // Checks if the namespace corresponds to a category that might be in the TMDB for getting images
+  checkTMDB = (mediaNS) => {
+    let validNameSpaces = [
+      "Film",
+      "Animation",
+      "Anime",
+      "Franchise",
+      "WesternAnimation",
+    ]
+    if (validNameSpaces.includes(mediaNS)) {
+      return true
+    } else return false
+  }
+
   fetchImage = async (title) => {
     try {
       const response = await axios.get(`/meta/movie?title=${title}`)
       const data = response.data
-      console.log("NAME: ", data.poster)
 
       if (!data.title) throw new Error("Movie not found")
-
 
       return data.poster
     } catch (err) {
@@ -104,7 +116,12 @@ class MediaGrid extends Component {
               key={key++}
               title={mediaItem.title}
               synopsis={mediaItem.url}
-              posterUrl={this.fetchImage(mediaItem.title)} // Remove quotes around mediaItem.posterUrl
+              nameSpace={mediaItem.ns}
+              posterUrl={
+                this.checkTMDB(mediaItem.ns)
+                  ? this.fetchImage(mediaItem.title)
+                  : null
+              }
             />
           ))}
         </GridContainer>
