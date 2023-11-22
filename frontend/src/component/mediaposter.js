@@ -110,7 +110,13 @@ class MediaPoster extends Component {
             alt={title}
             onError={this.handleImageError}
           />
-          {!isImageError && <AltText>{title}<br></br>{nameSpace}</AltText> }
+          {!isImageError && (
+            <AltText>
+              {title}
+              <br></br>
+              {nameSpace}
+            </AltText>
+          )}
         </ImageContainer>
         <Overlay style={{ opacity: isHovered ? 1 : 0 }}>
           <Title>{title}</Title>

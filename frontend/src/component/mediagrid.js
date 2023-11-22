@@ -57,31 +57,35 @@ class MediaGrid extends Component {
     startIndex: 0,
     itemsPerPage: 20,
     posterUrls: [], // New state to store fetched poster URLs
-  };
+  }
 
   async fetchData(startIndex, endIndex) {
-    const { mediaData } = this.props;
+    const { mediaData } = this.props
 
     try {
       const posterUrls = await Promise.all(
         mediaData.slice(startIndex, endIndex).map(async (mediaItem) => {
           if (this.checkTMDB(mediaItem.ns)) {
-            return await this.fetchImage(mediaItem.title);
+            return await this.fetchImage(mediaItem.title)
           }
-          return null;
+          return null
         })
-      );
+      )
       this.setState((prevState) => ({
-        posterUrls: [...prevState.posterUrls.slice(0, startIndex), ...posterUrls, ...prevState.posterUrls.slice(endIndex)],
-      }));
+        posterUrls: [
+          ...prevState.posterUrls.slice(0, startIndex),
+          ...posterUrls,
+          ...prevState.posterUrls.slice(endIndex),
+        ],
+      }))
     } catch (error) {
-      console.error('Error fetching poster URLs:', error);
+      console.error("Error fetching poster URLs:", error)
     }
   }
 
   componentDidMount() {
-    const { startIndex, itemsPerPage } = this.state;
-    this.fetchData(startIndex, startIndex + itemsPerPage);
+    const { startIndex, itemsPerPage } = this.state
+    this.fetchData(startIndex, startIndex + itemsPerPage)
   }
 
   handleNextClick = () => {
@@ -90,11 +94,11 @@ class MediaGrid extends Component {
         startIndex: prevState.startIndex + prevState.itemsPerPage,
       }),
       () => {
-        const { startIndex, itemsPerPage } = this.state;
-        this.fetchData(startIndex, startIndex + itemsPerPage); // Fetch new data when moving to the next page
-        window.scrollTo(0, 0); // Scroll to the top after updating state
+        const { startIndex, itemsPerPage } = this.state
+        this.fetchData(startIndex, startIndex + itemsPerPage) // Fetch new data when moving to the next page
+        window.scrollTo(0, 0) // Scroll to the top after updating state
       }
-    );
+    )
   }
 
   handlePrevClick = () => {
@@ -103,11 +107,11 @@ class MediaGrid extends Component {
         startIndex: Math.max(0, prevState.startIndex - prevState.itemsPerPage),
       }),
       () => {
-        const { startIndex, itemsPerPage } = this.state;
-        this.fetchData(startIndex, startIndex + itemsPerPage); // Fetch new data when moving to the previous page
-        window.scrollTo(0, 0); // Scroll to the top after updating state
+        const { startIndex, itemsPerPage } = this.state
+        this.fetchData(startIndex, startIndex + itemsPerPage) // Fetch new data when moving to the previous page
+        window.scrollTo(0, 0) // Scroll to the top after updating state
       }
-    );
+    )
   }
 
   // Checks if the namespace corresponds to a category that might be in the TMDB for getting images
@@ -139,10 +143,10 @@ class MediaGrid extends Component {
   }
 
   render() {
-    const { mediaData } = this.props;
-    const { startIndex, itemsPerPage, posterUrls } = this.state;
-    const endIndex = startIndex + itemsPerPage;
-    const visibleItems = mediaData.slice(startIndex, endIndex);
+    const { mediaData } = this.props
+    const { startIndex, itemsPerPage, posterUrls } = this.state
+    const endIndex = startIndex + itemsPerPage
+    const visibleItems = mediaData.slice(startIndex, endIndex)
 
     return (
       <MainContainer>
@@ -172,7 +176,7 @@ class MediaGrid extends Component {
           </StyledButton>
         </ButtonRow>
       </MainContainer>
-    );
+    )
   }
 }
 
