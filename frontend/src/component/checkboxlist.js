@@ -45,6 +45,7 @@ class CheckboxList extends Component {
     }
     this.setState({ checkedItems })
     this.handleUncheckedItemsCallback()
+    this.props.updateState()
   }
 
   handleSearch = (event) => {

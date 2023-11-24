@@ -135,10 +135,20 @@ class MediaGrid extends Component {
 
       if (!data.title) throw new Error("Movie not found")
 
-      console.log("Poster URL: ", data.poster)
       return await data.poster
     } catch (err) {
       console.error(err)
+    }
+  }
+
+  componentDidUpdate(prevProps)
+  {
+    if(prevProps.sharedState !== this.props.sharedState)
+    {
+      this.handleNextClick()
+      this.handlePrevClick()
+      this.props.sharedState = null
+      this.setState({ startIndex: 0 })
     }
   }
 
