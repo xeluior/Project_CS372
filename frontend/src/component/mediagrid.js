@@ -2,6 +2,7 @@ import React, { Component } from "react"
 import styled from "styled-components"
 import MediaPoster from "./mediaposter"
 import PropTypes from "prop-types"
+import axios from "axios"
 
 const MainContainer = styled.div`
   display: grid;
@@ -49,12 +50,42 @@ const StyledButton = styled.button`
   }
 `
 
-let key = 0
+// let key = 0
 
 class MediaGrid extends Component {
   state = {
     startIndex: 0,
     itemsPerPage: 20,
+    posterUrls: [], // New state to store fetched poster URLs
+  }
+
+  async fetchData(startIndex, endIndex) {
+    const { mediaData } = this.props
+
+    try {
+      const posterUrls = await Promise.all(
+        mediaData.slice(startIndex, endIndex).map(async (mediaItem) => {
+          if (this.checkTMDB(mediaItem.ns)) {
+            return await this.fetchImage(mediaItem.title)
+          }
+          return null
+        })
+      )
+      this.setState((prevState) => ({
+        posterUrls: [
+          ...prevState.posterUrls.slice(0, startIndex),
+          ...posterUrls,
+          ...prevState.posterUrls.slice(endIndex),
+        ],
+      }))
+    } catch (error) {
+      console.error("Error fetching poster URLs:", error)
+    }
+  }
+
+  componentDidMount() {
+    const { startIndex, itemsPerPage } = this.state
+    this.fetchData(startIndex, startIndex + itemsPerPage)
   }
 
   handleNextClick = () => {
@@ -62,7 +93,11 @@ class MediaGrid extends Component {
       (prevState) => ({
         startIndex: prevState.startIndex + prevState.itemsPerPage,
       }),
-      () => window.scrollTo(0, 0) // Scroll to the top after updating state
+      () => {
+        const { startIndex, itemsPerPage } = this.state
+        this.fetchData(startIndex, startIndex + itemsPerPage) // Fetch new data when moving to the next page
+        window.scrollTo(0, 0) // Scroll to the top after updating state
+      }
     )
   }
 
@@ -71,24 +106,68 @@ class MediaGrid extends Component {
       (prevState) => ({
         startIndex: Math.max(0, prevState.startIndex - prevState.itemsPerPage),
       }),
-      () => window.scrollTo(0, 0) // Scroll to the top after updating state
+      () => {
+        const { startIndex, itemsPerPage } = this.state
+        this.fetchData(startIndex, startIndex + itemsPerPage) // Fetch new data when moving to the previous page
+        window.scrollTo(0, 0) // Scroll to the top after updating state
+      }
     )
+  }
+
+  // Checks if the namespace corresponds to a category that might be in the TMDB for getting images
+  checkTMDB = (mediaNS) => {
+    let validNameSpaces = [
+      "Film",
+      "Animation",
+      "Anime",
+      "Franchise",
+      "WesternAnimation",
+    ]
+    if (validNameSpaces.includes(mediaNS)) {
+      return true
+    } else return false
+  }
+
+  fetchImage = async (title) => {
+    try {
+      const response = await axios.get(`/meta/movie?title=${title}`)
+      const data = response.data
+
+      if (!data.title) throw new Error("Movie not found")
+
+      return await data.poster
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
+  componentDidUpdate(prevProps)
+  {
+    if(prevProps.sharedState !== this.props.sharedState)
+    {
+      this.handleNextClick()
+      this.handlePrevClick()
+      this.props.sharedState = null
+      this.setState({ startIndex: 0 })
+    }
   }
 
   render() {
     const { mediaData } = this.props
-    const { startIndex, itemsPerPage } = this.state
-    const visibleItems = mediaData.slice(startIndex, startIndex + itemsPerPage)
+    const { startIndex, itemsPerPage, posterUrls } = this.state
+    const endIndex = startIndex + itemsPerPage
+    const visibleItems = mediaData.slice(startIndex, endIndex)
 
     return (
       <MainContainer>
         <GridContainer>
-          {visibleItems.map((mediaItem) => (
+          {visibleItems.map((mediaItem, index) => (
             <MediaPoster
-              key={key++}
+              key={index}
               title={mediaItem.title}
               synopsis={mediaItem.url}
-              posterUrl={mediaItem.posterUrl} // Remove quotes around mediaItem.posterUrl
+              nameSpace={mediaItem.ns}
+              posterUrl={posterUrls[startIndex + index]}
             />
           ))}
         </GridContainer>
@@ -101,7 +180,7 @@ class MediaGrid extends Component {
           </StyledButton>
           <StyledButton
             onClick={this.handleNextClick}
-            disabled={startIndex + itemsPerPage >= mediaData.length}
+            disabled={endIndex >= mediaData.length}
           >
             Next
           </StyledButton>

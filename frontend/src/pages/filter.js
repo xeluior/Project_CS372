@@ -77,6 +77,7 @@ class Filter extends React.Component {
       namespaceData: null,
       resultsFound: false, // false if the database hasn't returned anything, true if it has
       searchTimeout: null, // Timer for alerting the user that no results have been found if a threshold is met
+      intermediaryState: null, //Intermediary for indicating that a change has occured in checkboxlist.js, so that mediagrid.js can react accordingly 
     }
 
     this.getUncheckedTropeFilters = this.getUncheckedTropeFilters.bind(this)
@@ -193,6 +194,10 @@ class Filter extends React.Component {
     return resultArray
   }
 
+  updateStateFromChild = (newState) => {
+    this.setState({intermediaryState: newState})
+  }
+
   getUncheckedMediaFilters(uncheckedItems) {
     this.setState({ mediaFilterData: uncheckedItems }) // [{id: 4, label: 'Ride'}, {id: 5, label: 'Music'}]
   }
@@ -217,8 +222,6 @@ class Filter extends React.Component {
       }
     }
     let jsonResult = [{}]
-
-    console.log("MEDIA", mediaList)
 
     for (let i = 0; i < tropesList.length; i++) {
       let currentCount = 0
@@ -320,6 +323,7 @@ class Filter extends React.Component {
                 <CheckboxList
                   items={mediaCheckboxData}
                   onUncheckedItems={this.getUncheckedMediaFilters}
+                  updateState={this.updateStateFromChild}
                 />
               ) : (
                 <WhiteText>Loading filters...</WhiteText>
@@ -330,6 +334,7 @@ class Filter extends React.Component {
                 <CheckboxList
                   items={tropeCheckboxData}
                   onUncheckedItems={this.getUncheckedTropeFilters}
+                  updateState={this.updateStateFromChild}
                 />
               ) : (
                 <WhiteText>Loading filters...</WhiteText>
@@ -337,7 +342,7 @@ class Filter extends React.Component {
             </div>
           </FiltersSection>
           {mediaData && resultsFound ? (
-            <MediaGrid mediaData={mediaData} />
+            <MediaGrid mediaData={mediaData} sharedState={this.state.intermediaryState} />
           ) : (
             <WhiteText>Loading results...</WhiteText>
           )}

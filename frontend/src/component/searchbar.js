@@ -37,6 +37,12 @@ class SearchBar extends Component {
     }
   }
 
+  handleEnterKeyPress = (e) => {
+    if (e.key === "Enter") {
+      this.handleButtonClick()
+    }
+  }
+
   render() {
     const { query } = this.state
 
@@ -47,6 +53,7 @@ class SearchBar extends Component {
           placeholder={this.props.placeHolderText}
           value={query}
           onChange={this.onClick}
+          onKeyDown={this.handleEnterKeyPress}
         />
         <Link to="/filter">
           <button
