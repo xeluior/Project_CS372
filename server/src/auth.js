@@ -53,18 +53,16 @@ exports.check_token = (req, res, next) => {
 }
 
 // middleware for creating a user
-exports.create_user = (req, res) => {
+exports.create_user = async (req, res) => {
     // hash the password
-    bcrypt.hash(req.body.password, salt_rounds).then((hashed_pwd) => {
-        // insert to mongo
-        return users.insertOne({
-            email: req.body.email,
-            password: hashed_pwd
-        })
-    }).then(() => {
-        // send the user to the login screen
-        res.redirect(303, '/login')
+    const hashed_pwd = await bcrypt.hash(req.body.password, salt_rounds)
+    // insert to mongo
+    await users.insertOne({
+      email: req.body.email,
+      password: hashed_pwd
     })
+    // send the user to the login screen
+    res.redirect(303, '/login')
 }
 
 // middleware to ensure the user is authenticated

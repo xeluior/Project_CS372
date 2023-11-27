@@ -118,3 +118,6 @@ app.listen(port, () => {
     console.log(`Server listening on ${port}`)
 })
 
+// export for testing
+module.exports = app
+
