@@ -1,6 +1,21 @@
 import React, { Component } from "react"
 import PropTypes from "prop-types"
 import { Link } from "react-router-dom"
+import styled from "styled-components"
+
+const SearchBarContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`
+
+const Input = styled.input`
+  /* Add any additional styling for the input */
+`
+
+const SearchButton = styled.button`
+  /* Add any additional styling for the button */
+`
 
 class SearchBar extends Component {
   state = {
@@ -47,8 +62,8 @@ class SearchBar extends Component {
     const { query } = this.state
 
     return (
-      <div>
-        <input
+      <SearchBarContainer>
+        <Input
           type="text"
           placeholder={this.props.placeHolderText}
           value={query}
@@ -56,15 +71,11 @@ class SearchBar extends Component {
           onKeyDown={this.handleEnterKeyPress}
         />
         <Link to="/filter">
-          <button
-            type="button"
-            className="search_button"
-            onClick={this.handleButtonClick}
-          >
+          <SearchButton type="button" onClick={this.handleButtonClick}>
             {"Search"}
-          </button>
+          </SearchButton>
         </Link>
-      </div>
+      </SearchBarContainer>
     )
   }
 }
