@@ -17,7 +17,7 @@ const RelatedMovies = ({ ns, id }) => {
     useEffect(() => {
         const fetchRelatedMovies = async () => {
             try {
-                const response = await axios.get(`/recommend?ns=${ns}&id=${id}`);
+                const response = await axios.get(`/recommendation?ns=${ns}&id=${id}`);
                 setRelatedMovies(response.data);
             } catch (error) {
                 console.error('Error fetching related movies:', error);
