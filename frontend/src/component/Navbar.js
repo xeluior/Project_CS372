@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import {NavbarContainer, LeftContainer, RightContainer, NavbarExtenedContainer, NavbarInnerContainer, NavbarLinkContainer,  NavbarLink, SearchPNG, SearchInput} from "../styles/NavbarStyle";
+import { NavbarContainer, LeftContainer, RightContainer, NavbarInnerContainer, NavbarLinkContainer, NavbarLink, SearchPNG } from "../styles/NavbarStyle";
 import Image from "../assets/Search.png";
+import SearchBar from "./searchbar"; // Importing the SearchBar component
 
 function Navbar() {
     const [isSearchBarOpen, setIsSearchBarOpen] = useState(false);
@@ -11,25 +12,21 @@ function Navbar() {
 
     return (
         <NavbarContainer>
-
             <NavbarInnerContainer>
                 <LeftContainer>
                     <NavbarLinkContainer>
-                    <NavbarLink to="/">Home</NavbarLink>
-                    <NavbarLink to="/recommend">Recommend</NavbarLink>
-                    <NavbarLink to="/login">Login</NavbarLink>
+                        <NavbarLink to="/">Home</NavbarLink>
+                        <NavbarLink to="/recommend">Recommend</NavbarLink>
+                        <NavbarLink to="/login">Login</NavbarLink>
                     </NavbarLinkContainer>
                 </LeftContainer>
                 <RightContainer>
                     <SearchPNG src={Image} onClick={toggleSearchBar}></SearchPNG>
                     {isSearchBarOpen && (
-                        <SearchInput type="text" placeholder="Search..." />
+                        <SearchBar placeHolderText="Search..." />
                     )}
                 </RightContainer>
             </NavbarInnerContainer>
-
-            <NavbarExtenedContainer></NavbarExtenedContainer>
-            
         </NavbarContainer>
     );
 }

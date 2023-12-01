@@ -19,7 +19,7 @@ const MovieDetail = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-const movieTitle = sessionStorage.getItem("recommend");
+  const movieTitle = sessionStorage.getItem("recommend");
 
   useEffect(() => {
     const fetchData = async () => {
