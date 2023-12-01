@@ -18,7 +18,20 @@ const RelatedMovies = ({ ns, id }) => {
         const fetchRelatedMovies = async () => {
             try {
                 const response = await axios.get(`/recommendation?ns=${ns}&id=${id}`);
-                setRelatedMovies(response.data);
+                const relatedMoviesData = response.data;
+
+                // Fetch additional metadata for each movie
+                const metadataPromises = relatedMoviesData.map(movie => 
+                    axios.get(`/meta/movie?title=${movie.title}`) // Adjust this endpoint as needed
+                );
+
+                const metadataResponses = await Promise.all(metadataPromises);
+                const relatedMoviesWithMetadata = metadataResponses.map((response, index) => ({
+                    ...relatedMoviesData[index],
+                    ...response.data // Merge the original movie data with the additional metadata
+                }));
+
+                setRelatedMovies(relatedMoviesWithMetadata);
             } catch (error) {
                 console.error('Error fetching related movies:', error);
             }
