@@ -7,9 +7,10 @@ export const MoviePageContainer = styled.div`
     padding: 20px;
     max-width: 1200px;
     margin: 0 auto;
-    min-height: 100vh;
-    box-sizing: border-box;  // ensures padding doesn't add to the total height
+    box-sizing: border-box;
+    // Removed min-height: 100vh to allow the container to grow with content
 `;
+
 
 export const MoviePoster = styled.div`
     width: 200px;
