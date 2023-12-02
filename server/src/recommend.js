@@ -131,8 +131,7 @@ async function check_cache(req, res, next) {
 async function get_recommendations(req, res) {
   const page = await pages.findOne({ ns: req.query.ns, id: req.query.id })
   const recommendations = page.recommendations || []
-  
-  res.send(await Promise.all(recommendations.map(async (item) => {
+  const extra_data = await Promise.all(recommendations.map(async (item) => {
     if(!item) return undefined
     if (item.likes) {
       item.score += item.likes.length
@@ -143,7 +142,9 @@ async function get_recommendations(req, res) {
       item.title = rec_details.title
     }
     return item
-  })))
+  }))
+  
+  res.send(extra_data.sort((a, b) => (a.score < b.score) ? 1 : -1))
 }
 
 module.exports = { check_cache, get_recommendations }
