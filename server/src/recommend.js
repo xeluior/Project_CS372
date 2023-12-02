@@ -132,12 +132,14 @@ async function get_recommendations(req, res) {
   const page = await pages.findOne({ ns: req.query.ns, id: req.query.id })
   const recommendations = page.recommendations || []
   
-  res.send(recommendations.map((item) => {
+  res.send(recommendations.map(async (item) => {
     if (!item) return undefined
     if (item.likes) {
       item.score += item.likes.length
       item.likes = undefined
     }
+    const rec_details = await pages.findOne({id: item.id, ns: item.ns})
+    item.title = rec_details.title
     return item
   }))
 }
