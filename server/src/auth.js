@@ -67,6 +67,16 @@ exports.create_user = (req, res) => {
     })
 }
 
+// middleware to ensure the user is authenticated
+exports.ensure = (req, res, next) => {
+  if (!req.session.uid) {
+    res.sendStatus(403)
+    return
+  }
+
+  next()
+}
+
 // middleware for removing user
 exports.delete_user = (req, res) => {
     req.session.destroy(() => {
