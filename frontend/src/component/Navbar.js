@@ -16,7 +16,6 @@ function Navbar() {
                 <LeftContainer>
                     <NavbarLinkContainer>
                     <NavbarLink to="/">Home</NavbarLink>
-                    <NavbarLink to="/recommend">Recommend</NavbarLink>
                     <NavbarLink to="/login">Login</NavbarLink>
                     </NavbarLinkContainer>
                 </LeftContainer>
