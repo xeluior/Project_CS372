@@ -1,46 +1,80 @@
-import React from "react";
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+//import { useNavigate } from 'react-router-dom';
 import { 
     RelatedMoviesContainer, 
     RelatedTitle, 
-    RelatedMovieTitle, 
-    RelatedDescription, 
+    RelatedMovieTitle,
     RelatedRating, 
     RelatedMoviePoster, 
     RelatedMoviesList, 
     RelatedMovieContainer 
-} from "../styles/relatedStyle";
+} from '../styles/relatedStyle';
 
-const relatedMovies = () => {
-    const RelatedMovies = [
-        {
-            title: "Related Movie 1",
-            rating: "8.5/10",
-            description: "Description for Related Movie 1",
-            poster: "https://artworks.thetvdb.com/banners/movies/113/posters/2195447.jpg",
-        },
-        {
-            title: "Related Movie 2",
-            rating: "7.9/10",
-            description: "Description for Related Movie 2",
-            poster: "https://artworks.thetvdb.com/banners/movies/113/posters/2195447.jpg",
-        },
-    ];
+const RelatedMovies = ({ ns, id }) => {
+    const [relatedMovies, setRelatedMovies] = useState([]);
+    //const navigate = useNavigate();
+
+    useEffect(() => {
+        const fetchRelatedMovies = async () => {
+            try {
+                const response = await axios.get(`/recommendation?ns=${ns}&id=${id}`);
+                const relatedMoviesData = response.data.filter(item => item !== null && item.ns === "Film");
+
+                const metadataPromises = await Promise.all(relatedMoviesData.map(async movie => {
+                    try {
+                        return await axios.get(`/meta/movie?title=${movie.title}`);
+                    } catch (error) {
+                        console.error("Error fetching movie title");
+                        return { data: {} };
+                    }
+                }));
+
+                const relatedMoviesWithMetadata = metadataPromises.map((response, index) => ({
+                    ...relatedMoviesData[index],
+                    ...response.data
+                }));
+
+                const limitedMovies = relatedMoviesWithMetadata.slice(0, 200);
+                setRelatedMovies(limitedMovies);
+            } catch (error) {
+                console.error('Error fetching related movies:', error);
+            }
+        };
+
+        fetchRelatedMovies();
+    }, [ns, id]);
+
+    const redirectToMovieDetail = (movieTitle) => {
+        console.log('Redirecting to /recommend');
+        sessionStorage.setItem("recommend", movieTitle);
+        //navigate('/recommend'); // Use navigate for navigation
+        window.location.reload();
+    };
 
     return (
         <RelatedMoviesContainer>
             <RelatedTitle>Related Movies</RelatedTitle>
             <RelatedMoviesList>
-                {RelatedMovies.map((movie, index) => (
-                    <RelatedMovieContainer key={index}>
-                        <RelatedMoviePoster bgImage={movie.poster} aria-label={movie.title}></RelatedMoviePoster>
-                        <RelatedMovieTitle>{movie.title}</RelatedMovieTitle>
-                        <RelatedRating>{movie.rating}</RelatedRating>
-                        <RelatedDescription>{movie.description}</RelatedDescription>
-                    </RelatedMovieContainer>
-                ))}
+                {relatedMovies.map((movie, index) => {
+                    if (movie.poster) {
+                        return (
+                            <RelatedMovieContainer key={index}>
+                                <RelatedMoviePoster 
+                                    bgImage={movie.poster} 
+                                    aria-label={movie.title}
+                                    onClick={() => redirectToMovieDetail(movie.title)}
+                                ></RelatedMoviePoster>
+                                <RelatedMovieTitle>{movie.title}</RelatedMovieTitle>
+                                <RelatedRating>{(movie.rating * 10).toFixed(0)}%</RelatedRating>
+                            </RelatedMovieContainer>
+                        );
+                    }
+                    return null;
+                })}
             </RelatedMoviesList>
         </RelatedMoviesContainer>
     );
 };
 
-export default relatedMovies;
+export default RelatedMovies;

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import axios from 'axios';
 import {
   MoviePageContainer,
   MoviePoster,
@@ -13,13 +14,17 @@ import {
   BackButton,
 } from "../styles/recommendStyle";
 import RelatedMovies from "../component/relatedMovies";
-import axios from 'axios';
+
 const MovieDetail = () => {
   const [movie, setMovie] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Using a constant namespace 'Film' and getting the movie title from session storage
+  const ns = "Film";
   const movieTitle = sessionStorage.getItem("recommend");
+  // Remove spaces from the movie title to use as the ID
+  const id = movieTitle.replace(/[^a-zA-Z0-9]/g, '');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -30,6 +35,8 @@ const MovieDetail = () => {
         if (!data.title) throw new Error('Movie not found');
 
         setMovie({
+          ns: ns,
+          id: id,
           title: data.title,
           rating: data.rating,
           description: data.description,
@@ -48,7 +55,7 @@ const MovieDetail = () => {
     };
 
     fetchData();
-  }, [movieTitle]);
+  }, [ns, id]);
 
   return (
     <div>
@@ -71,7 +78,7 @@ const MovieDetail = () => {
               <BackButton onClick={() => window.history.back()}>Go Back</BackButton>
             </MovieDetails>
           </MoviePageContainer>
-          <RelatedMovies></RelatedMovies>
+          <RelatedMovies ns={ns} id={id}></RelatedMovies>
         </>
       )}
     </div>
