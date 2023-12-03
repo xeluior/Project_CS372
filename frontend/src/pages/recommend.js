@@ -26,7 +26,6 @@ const MovieDetail = () => {
   // Remove spaces from the movie title to use as the ID
   const id = movieTitle.replace(/[^a-zA-Z0-9]/g, '');
 
-
   useEffect(() => {
     const fetchData = async () => {
       try {
