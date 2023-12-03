@@ -119,7 +119,15 @@ async function check_cache(req, res, next) {
     // this may lose some likes which have been added while the algorithm is running
     await pages.updateOne({_id: page._id}, { $set: {
       rec_cache_ttl: get_ttl(),
-      recommendations: recs
+      recommendations: recs.sort((a, b) => {
+        const a_score = a.score + (a.likes ? a.likes.length : 0)
+        const b_score = b.score + (b.likes ? b.likes.length : 0)
+        if (a_score < b_score) {
+          return 1
+        } else {
+          return -1
+        }
+      })
     }})
   }
 
@@ -129,7 +137,11 @@ async function check_cache(req, res, next) {
 // calculates the final score based on likes as well as score
 // removes the likes list from the result to avoid leaking data to the frontend
 async function get_recommendations(req, res) {
-  const page = await pages.findOne({ ns: req.query.ns, id: req.query.id })
+  const page = await pages.findOne(
+    { ns: req.query.ns, id: req.query.id },
+    { projection: { recommendations: { $slice: 100 } } }
+  )
+  console.log(page.recommendations.length)
   const recommendations = page.recommendations || []
   const extra_data = await Promise.all(recommendations.map(async (item) => {
     if(!item) return undefined
@@ -144,7 +156,7 @@ async function get_recommendations(req, res) {
     return item
   }))
   
-  res.send(extra_data.sort((a, b) => (a.score < b.score) ? 1 : -1))
+  res.send(extra_data)
 }
 
 module.exports = { check_cache, get_recommendations }
