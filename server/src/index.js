@@ -8,6 +8,7 @@ const recommend = require('./recommend.js')
 const likes = require('./likes.router.js')
 const cors = require('cors')
 const path = require('path')
+const bodyparser = require('body-parser')
 
 // environment configuration from .env file
 require("dotenv").config()
@@ -67,7 +68,7 @@ app.get("/search", (req, res) => {
 })
 
 //watch later function
-app.post("/watch-later", (req, res) => {
+app.post("/watch-later", async (req, res) => {
     /*get user id based on token (session id)
     add namespace:id of item to json attribute*/
     
@@ -75,7 +76,7 @@ app.post("/watch-later", (req, res) => {
     if (req.session.uid !== null) {
         const watch_later = { id: req.query.id, title: req.body }
         //if watch-later exists, append
-        if (media.find(watch_later)) {
+        if (await media.find(watch_later)) {
             users.update(
                 {
                     id: req.session.uid,
@@ -102,6 +103,56 @@ app.post("/watch-later", (req, res) => {
         res.sendStatus(403)
     }
 
+})
+
+app.get("/watch-later", (req, res) => {
+    /*get user id based on token (session id)
+    find namespace:id of item of json attribute*/
+
+    //check if user is logged in
+    if (req.session.uid !== null) {
+        users.find(
+            {
+                id: req.session.uid,
+            },
+            { 
+                // make watch-later an array and .add() trope
+                $text: {
+                    $search: watch_later
+                }
+            )
+            res.sendStatus(200)
+        }
+        else {
+            users.insert(
+                {
+                    watch_later: {id: req.query.id, title: req.body}
+                }
+            )
+            res.sendStatus(200)
+        }
+    }
+    else {
+        res.sendStatus(404)
+    }
+})
+
+app.delete("/watch-later", (req, res) => {
+    /*get user id based on token (session id)
+    delete namespace:id of item from json attribute*/
+
+    //check if user is logged in
+    if (req.session.uid !== null) {
+        users.deleteOne(
+            {
+                id: req.query.id
+            }
+        )
+        res.sendStatus(200)
+    }
+    else {
+        res.sendStatus(404)
+    }
 })
 
 // serve static resources from the server
